@@ -1,0 +1,6 @@
+.vagrant
+
+forms-app/node_modules
+forms-app/src/credentials
+forms-app/.vscode
+

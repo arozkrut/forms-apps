@@ -1,0 +1,13 @@
+[Unit]
+Description=Start proxy server
+
+[Service]
+Restart=always
+User=vagrant
+Group=vagrant
+WorkingDirectory=/vagrant/testy-proxy/
+ExecStart=node src/server.js
+Type=simple
+
+[Install]
+WantedBy=vagrant.mount

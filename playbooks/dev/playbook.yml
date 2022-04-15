@@ -1,0 +1,80 @@
+---
+- hosts: all
+
+  vars:
+    PYTHON: "/usr/bin/python3"
+    ansible_python_interpreter: "/usr/bin/python3"
+
+  tasks:
+
+    # https://github.com/ansible/ansible/issues/25414#issuecomment-440549135
+    - name: Wait for any possibly running unattended upgrade to finish
+      raw: systemd-run --property="After=apt-daily.service apt-daily-upgrade.service" --wait /bin/true
+      become: yes
+
+    - name: Install python3
+      apt:
+        pkg:
+        - python3
+        - python3-venv
+        - python3-pip
+      become: yes
+
+    - name: Add source command to .bashrc
+      lineinfile:
+        path: ~/.bashrc
+        line: "source ~/env3/bin/activate"
+        regex: "^source ~/env3/bin/activate$"
+        state: present
+        insertafter: EOF
+        create: yes
+
+    - name: Upgrade pip
+      vars:
+        ansible_python_interpreter: "{{ PYTHON }}"
+      pip:
+        name: pip
+        state: latest
+        virtualenv: ~/env3
+        virtualenv_command: "{{ PYTHON }} -m venv"
+
+    - name: set up nodejs sources
+      shell: curl -fsSL https://deb.nodesource.com/setup_16.x | sudo bash -
+      become: yes
+
+    - name: Install the nodejs
+      apt:
+        name: nodejs
+        state: present
+      become: yes
+
+    - name: install packages
+      shell: npm i
+      args:
+        chdir: /vagrant/testy-proxy
+
+    - name: Deploy proxy app
+      copy:
+        src: proxy.service
+        dest: /etc/systemd/system/
+        force: yes
+      become: yes
+
+    # Enable and run
+    - name: Systemd daemon reload
+      systemd:
+        daemon_reload: yes
+      become: yes
+
+    - name: Enable and run proxy service
+      service:
+        name: proxy
+        enabled: yes
+        state: started
+      become: yes
+
+#- name: Include playbook with postgres configuration
+#  import_playbook: postgres.yml
+
+#- name: Include playbook with services configuration
+#  import_playbook: services.yml
