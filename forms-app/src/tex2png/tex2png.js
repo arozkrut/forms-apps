@@ -5,23 +5,25 @@
 */
 const {spawn} = require('child_process');
 
-module.exports = function (jsonForm){
+module.exports = function (jsonForm, id){
   return new Promise((resolve) => {
     var qst = jsonForm.questions;
     var done=0;
     for(var i in qst){
       if(qst[i].tex){
-        const python = spawn('python3', ['tex2png.py', qst[i].text, i]);
+        console.log(qst[i].text, id + 'question' + i);
+        const python = spawn('python3', ['./src/tex2png/tex2png.py', qst[i].text, id + 'question' + i]);
         python.on('exit', (exitCode)=>{
-          if(exitCode!= 0){
+          if(exitCode != 0){
             resolve(false);
+            console.log("some error inside" + exitCode); // TODO: delete this
           }
           //Implementacja oczekiwania, aż wszystkie podprocesy się zakończą (poprawnie)
           done++;
           if(done===qst.length) resolve(true);
-        })
+        });
       }
       else done++;
     }
-  })
-}
+  });
+};

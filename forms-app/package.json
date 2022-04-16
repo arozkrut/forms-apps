@@ -1,5 +1,5 @@
 {
-  "name": "testy-proxy",
+  "name": "form-app",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -22,5 +22,8 @@
     "https": "^1.0.0",
     "jsonschema": "^1.4.0",
     "multer": "^1.4.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.13.0"
   }
 }

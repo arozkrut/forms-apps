@@ -31,7 +31,7 @@ SOFTWARE.
 module.exports = function (json){
   return new Promise((resolve) => {
     var Validator = require('jsonschema').Validator;
-    var validator=  new Validator();
+    var validator = new Validator();
     //schemat pytania:
     var question = {
       "id": "/question",
@@ -55,12 +55,13 @@ module.exports = function (json){
       "type": "object",
       "required": ["title", "questions"],
       "properties": {
-      "title": {"type": "string"},
-      "email": {"type": "string"},
-      "check": {"type": "boolean"},
-      "questions": {"type": "array", "items": {"$ref": "question"}
-    }}}
+        "title": {"type": "string"},
+        "email": {"type": "string"},
+        "check": {"type": "boolean"},
+        "questions": {"type": "array", "items": {"$ref": "question"}}
+      }
+    };
     validator.addSchema(question, '/question');
     resolve( validator.validate(json, schema).valid);
   });
-}
+};

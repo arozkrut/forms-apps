@@ -37,6 +37,7 @@
         state: latest
         virtualenv: ~/env3
         virtualenv_command: "{{ PYTHON }} -m venv"
+# TODO: add pip imgurpython and latex
 
     - name: set up nodejs sources
       shell: curl -fsSL https://deb.nodesource.com/setup_16.x | sudo bash -
