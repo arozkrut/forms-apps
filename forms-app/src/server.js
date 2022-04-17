@@ -40,6 +40,29 @@ async function quickstart() {
 }
 quickstart();
 
+app.get('/forms/:id', async (req, res) => {
+  const id = req.params.id;
+  console.log('[GET] /forms: get info about the form \'', id, '\'');
+
+  if(!id || id === ''){
+    console.log('\x1b[31m', 'ERROR: wrong id');
+    res.status(400).end();
+    return;
+  }
+
+  try {
+    const response = await forms.forms.get({
+      formId: id,
+    });
+    res.send(response);
+  }
+  catch( err ){
+    console.log('\x1b[31m', 'ERROR: form was not found');
+    console.error(err);
+    res.status(404).send(err);
+  }
+});
+
 
 app.post('/forms', async (req, res) => {
   const title = req.body.title;
@@ -112,7 +135,7 @@ app.put('/forms/:id', async (req, res) => {
       return links;
     })
     // TODO: update form
-    .then((links) => updateFormUsingJsonTemplate(id, jsonTemplate, links, formInfo));
+    .then((links) => updateFormUsingJsonTemplate(id, jsonTemplate, links, formInfo.data));
     
   }
   catch(err) {
@@ -128,8 +151,82 @@ app.put('/forms/:id', async (req, res) => {
   }
 });
 
+// TODO: add fields for form description, suffling questions and answers, remove email field
+// TODO: add option for tex answers
+// TODO: grading tests
 async function updateFormUsingJsonTemplate(id, jsonTemplate, links, formInfo) {
+  if ( jsonTemplate.title != formInfo.info.title ) {
+    forms.forms.batchUpdate({
+      formId: id,
+      requestBody: {
+        includeFormInResponse: false,
+        requests: [ {
+          updateFormInfo: {
+            info: {
+              title: jsonTemplate.title
+            },
+            updateMask: "title"
+          }
+        } ],
+        writeControl: {
+          "requiredRevisionId": formInfo.revisionId
+        }
+      }
+    });
+  }
 
+  const mapQuestion = (q, index) => {
+    var question;
+    if( q.type === 'checkBox' ) {
+      question = {
+        choiceQuestion: {
+          type: "CHECKBOX",
+          options: []
+        }
+      };
+    }
+    return {
+      question: question,
+      image: q.tex 
+        ? {
+          sourceUri: links["q" + index],
+          properties: {
+            alignment: "CENTER"
+          }
+        }
+        : undefined
+    };
+  };
+
+  if( !formInfo.items) {
+    var requests = { ...jsonTemplate.questions };
+    requests.map((q, index) => ({
+      createItem: {
+        item: {
+          questionItem: mapQuestion(q, index),
+          description: q.tex
+            ? undefined
+            : q.text
+        },
+        location: {
+
+        }
+      }})
+    );
+
+    forms.forms.batchUpdate({
+      formId: id,
+      requestBody: {
+        includeFormInResponse: false,
+        requests: [ {
+          
+        } ],
+        writeControl: {
+          "requiredRevisionId": formInfo.revisionId
+        }
+      }
+    });
+  }
 }
 
 // Ustawienie portu, na którym serwer nasłuchuje
