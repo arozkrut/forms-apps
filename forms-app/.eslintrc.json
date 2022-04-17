@@ -9,6 +9,11 @@
         "ecmaVersion": "latest"
     },
     "rules": {
-        "semi": ["error", "always"]
+        "semi": ["error", "always"],
+        "no-duplicate-imports": ["error"],
+        "array-bracket-spacing": ["error", "always"],
+        "arrow-spacing": ["error"],
+        "block-spacing": ["error", "always"],
+        "comma-spacing": ["error"]
     }
 }

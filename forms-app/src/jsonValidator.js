@@ -36,9 +36,9 @@ module.exports = function (json){
     var question = {
       "id": "/question",
       "type": "object",
-      "required": ["type", "text", "tex"],
+      "required": [ "type", "text", "tex" ],
       "properties": {
-        "type": {"type": "string", "enum": ["checkBox", "grid", "text", "list"]},
+        "type": {"type": "string", "enum": [ "checkBox", "grid", "text", "list" ]},
         "text": {"type": "string"},
         "tex": {"type": "boolean"},
         "answers": { "type": "array", "items" : {
@@ -53,7 +53,7 @@ module.exports = function (json){
     var schema = {
       "id": "/schema",
       "type": "object",
-      "required": ["title", "questions"],
+      "required": [ "title", "questions" ],
       "properties": {
         "title": {"type": "string"},
         "email": {"type": "string"},
@@ -62,6 +62,6 @@ module.exports = function (json){
       }
     };
     validator.addSchema(question, '/question');
-    resolve( validator.validate(json, schema).valid);
+    resolve( validator.validate(json, schema).valid );
   });
 };

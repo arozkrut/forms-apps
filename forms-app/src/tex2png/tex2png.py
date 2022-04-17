@@ -9,7 +9,7 @@ from pdf2image import convert_from_path
 # Biblioteka openCV  - zmienia rozmiar wynikowego obrazu
 import cv2
 # Biblioteka pozwalająca na konwersję obrazu do formatu base64.
-import base64
+from imgurpython import ImgurClient
 
 # Deklaracje nazw plików pośrednich:
 tex = "assets/qst"+sys.argv[2]+".tex"
@@ -62,4 +62,16 @@ cv2.imwrite(png, dst)
 os.remove(tex)
 os.remove(pic)
 os.remove(pdf)
-print("zakończone")
+
+credentials_file = open('src/credentials/imgur_credentials.txt', 'r')
+credentials = credentials_file.read().split()
+credentials_file.close()
+
+client_id = credentials[1]
+client_secret = credentials[3]
+
+client = ImgurClient(client_id, client_secret)
+
+# Example request
+response = client.upload_from_path(png)
+print(response['link'])

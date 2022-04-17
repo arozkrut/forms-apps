@@ -46,8 +46,8 @@ app.post('/forms', async (req, res) => {
   console.log('[POST] /forms: create a new form with the title \'', title, '\'');
 
   if(!title || typeof title !== 'string'){
-    res.status(400).end();
     console.log('\x1b[31m', 'ERROR: wrong title');
+    res.status(400).end();
   }
   else {
     try {
@@ -75,49 +75,62 @@ app.put('/forms/:id', async (req, res) => {
   console.log('[PUT] /forms: update the form \'', id, '\'');
 
   if(!id || id === ''){
-    res.status(400).end();
     console.log('\x1b[31m', 'ERROR: wrong id');
+    res.status(400).end();
+    return;
   }
-  else {
-    // * check if form exists
-    try {
-      await forms.forms.get({
-        formId: id,
-      });
+
+  // * check if form exists
+  try {
+    const formInfo = await forms.forms.get({
+      formId: id,
+    });
+
+    const jsonTemplate = req.body;
+
+    // * validate json
+    validation(jsonTemplate)
+    .then((valid) => {
+      if (!valid) {
+        throw {
+          customName: "NotValid",
+          message: "json template is not valid",
+          status: 400,
+        };
+      }
+    })
+    // * convert tex to png for each question and upload these images to imgur
+    .then(() => tex2png(jsonTemplate, id))
+    .then((links) => {
+      if(!links) {
+        throw {
+          customName: "ConversionFailed",
+          message: "conversion to png or upload to Imgur failed",
+          status: 500,
+        };
+      }
+      return links;
+    })
+    // TODO: update form
+    .then((links) => updateFormUsingJsonTemplate(id, jsonTemplate, links, formInfo));
+    
+  }
+  catch(err) {
+    if ( err.customName ) {
+      console.log('\x1b[31m', 'ERROR:' + err.message);
+      res.status(err.status).send(err.message);
     }
-    catch(err) {
+    else {
       console.log('\x1b[31m', 'ERROR: form was not found');
       console.error(err);
       res.status(404).send(err);
-      return;
     }
-
-    // * validate json
-    const jsonTemplate = req.body;
-
-    validation(jsonTemplate).then((valid) => {
-      if (valid) {
-        tex2png(jsonTemplate, id).then((stat) => {
-          // * convert tex to png for each question
-          if(stat) {
-            // TODO: update form
-          }
-          else {
-            console.log('\x1b[31m', 'ERROR: conversion to png failed');
-            res.status(400).end();
-            return;
-          }
-        });
-      }
-      else {
-        res.status(400).send("Error: json template is not valid");
-        console.log('\x1b[31m', 'ERROR: json template is not valid');
-        return;
-      }
-    });
   }
 });
 
+async function updateFormUsingJsonTemplate(id, jsonTemplate, links, formInfo) {
 
-//Ustawienie portu, na którym serwer nasłuchuje
+}
+
+// Ustawienie portu, na którym serwer nasłuchuje
 app.listen(port);
