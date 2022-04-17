@@ -42,7 +42,7 @@ module.exports = function (json){
         "text": {"type": "string"},
         "tex": {"type": "boolean"},
         "answers": { "type": "array", "items" : {
-          "answer" : {"type" : "string"},
+          "text" : {"type" : "string"},
           "tex": {"type": "boolean"},
           "correct" : {"type" : "boolean"}
           }

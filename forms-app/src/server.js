@@ -112,31 +112,29 @@ app.put('/forms/:id', async (req, res) => {
     const jsonTemplate = req.body;
 
     // * validate json
-    validation(jsonTemplate)
-    .then((valid) => {
-      if (!valid) {
-        throw {
-          customName: "NotValid",
-          message: "json template is not valid",
-          status: 400,
-        };
-      }
-    })
+    const valid = await validation(jsonTemplate);
+    if (!valid) {
+      throw {
+        customName: "NotValid",
+        message: "json template is not valid",
+        status: 400,
+      };
+    }
+
     // * convert tex to png for each question and upload these images to imgur
-    .then(() => tex2png(jsonTemplate, id))
-    .then((links) => {
-      if(!links) {
-        throw {
-          customName: "ConversionFailed",
-          message: "conversion to png or upload to Imgur failed",
-          status: 500,
-        };
-      }
-      return links;
-    })
+    const links = await tex2png(jsonTemplate, id);
+    if(!links) {
+      throw {
+        customName: "ConversionFailed",
+        message: "conversion to png or upload to Imgur failed",
+        status: 500,
+      };
+    }
+
     // TODO: update form
-    .then((links) => updateFormUsingJsonTemplate(id, jsonTemplate, links, formInfo.data));
-    
+    await updateFormUsingJsonTemplate(id, jsonTemplate, links, formInfo.data);
+
+    res.status(200).send("OK");
   }
   catch(err) {
     if ( err.customName ) {
@@ -152,44 +150,122 @@ app.put('/forms/:id', async (req, res) => {
 });
 
 // TODO: add fields for form description, suffling questions and answers, remove email field
-// TODO: add option for tex answers
 // TODO: grading tests
 async function updateFormUsingJsonTemplate(id, jsonTemplate, links, formInfo) {
+
   if ( jsonTemplate.title != formInfo.info.title ) {
-    forms.forms.batchUpdate({
-      formId: id,
-      requestBody: {
-        includeFormInResponse: false,
-        requests: [ {
-          updateFormInfo: {
-            info: {
-              title: jsonTemplate.title
-            },
-            updateMask: "title"
-          }
-        } ],
-        writeControl: {
-          "requiredRevisionId": formInfo.revisionId
+    await updateTitle(id, formInfo.title, formInfo.revisionId);
+  }
+
+  var newRevisionId = formInfo.revisionId;
+  if(formInfo.items) {
+    newRevisionId = await deleteAllFormItems(id, formInfo.items.length, formInfo.revisionId);
+  }
+ 
+  await addItemsToForm(id, jsonTemplate, links, newRevisionId);
+}
+
+async function updateTitle(id, title, revisionId) {
+  await forms.forms.batchUpdate({
+    formId: id,
+    requestBody: {
+      includeFormInResponse: false,
+      requests: [ {
+        updateFormInfo: {
+          info: {
+            title: title
+          },
+          updateMask: "title"
+        }
+      } ],
+      writeControl: {
+        requiredRevisionId: revisionId
+      }
+    }
+  });
+}
+
+async function deleteAllFormItems(id, items, revisionId) {
+  var requests = [];
+  for( var i = items - 1; i >= 0; i--) {
+    requests.push({
+      deleteItem: {
+        location: {
+          index: i
         }
       }
     });
   }
 
-  const mapQuestion = (q, index) => {
+  const response = await forms.forms.batchUpdate({
+    formId: id,
+    requestBody: {
+      includeFormInResponse: false,
+      requests: requests,
+      writeControl: {
+        requiredRevisionId: revisionId
+      }
+    }
+  });
+
+  return response.data.revisionId;
+}
+
+async function addItemsToForm(id, jsonTemplate, links, newRevisionId) {
+  const choiceQuestion = (q, index, type) => ({
+    choiceQuestion: {
+      type: type,
+      options: q.answers.map((a, position) => ({
+        value: a.tex
+          ? ' '
+          : a.text,
+        image: a.tex 
+          ? {
+            sourceUri: links["q" + index + 'a' + position],
+            properties: {
+              alignment: "CENTER"
+            }
+          }
+          : undefined,
+        isOther: false
+      })),
+      shuffle: false
+    }
+  });
+
+  const mapQuestion = (q, index, linkKey) => {
     var question;
     if( q.type === 'checkBox' ) {
+      question = choiceQuestion(q, index, "CHECKBOX");
+    }
+    else if(q.type === 'list') {
+      question = choiceQuestion(q, index, "RADIO");
+    }
+    else if(q.type === 'grid') {
+      throw {
+        customName: "FailedToParseQuestion",
+        message: "Server failed to parse one of the questions. Make sure json template has correct schema",
+        status: 500,
+      };
+    }
+    else if(q.type === 'text') {
       question = {
-        choiceQuestion: {
-          type: "CHECKBOX",
-          options: []
+        textQuestion: {
+          paragraph: false
         }
       };
     }
+    else throw {
+      customName: "UnknownQuestionType",
+      message: "one of the questions in json template has unknown type",
+      status: 400,
+    };
+
     return {
       question: question,
       image: q.tex 
         ? {
-          sourceUri: links["q" + index],
+          sourceUri: links[linkKey],
           properties: {
             alignment: "CENTER"
           }
@@ -198,35 +274,71 @@ async function updateFormUsingJsonTemplate(id, jsonTemplate, links, formInfo) {
     };
   };
 
-  if( !formInfo.items) {
-    var requests = { ...jsonTemplate.questions };
-    requests.map((q, index) => ({
-      createItem: {
-        item: {
-          questionItem: mapQuestion(q, index),
-          description: q.tex
-            ? undefined
-            : q.text
+  const mapItem = (q, index) => {
+    return q.type === 'grid'
+      ? {
+        questionGroupItem: {
+          questions: q.answers.map((a, position) => 
+            mapQuestion(
+              {
+                type: 'list',
+                text: a.text,
+                tex: a.tex,
+                answers: [
+                {
+                  text: 'Prawda',
+                  tex: false
+                },
+                {
+                  text: 'Fałsz',
+                  tex: false
+                } ]
+              },
+              position,
+              'q' + index + 'a' + position
+            ),
+          ),
+          image: q.tex 
+            ? {
+              sourceUri: links["q" + index],
+              properties: {
+                alignment: "CENTER"
+              }
+            }
+            : undefined
         },
-        location: {
-
-        }
-      }})
-    );
-
-    forms.forms.batchUpdate({
-      formId: id,
-      requestBody: {
-        includeFormInResponse: false,
-        requests: [ {
-          
-        } ],
-        writeControl: {
-          "requiredRevisionId": formInfo.revisionId
-        }
+        description: q.tex
+          ? undefined
+          : q.text
       }
-    });
-  }
+      : {
+        questionItem: mapQuestion(q, index, "q" + index),
+        description: q.tex
+          ? undefined
+          : q.text
+      };
+  };
+
+
+  var requests = jsonTemplate.questions.map((q, index) => ({
+    createItem: {
+      item: mapItem(q, index),
+      location: {
+        index: index
+      }
+    }})
+  );
+
+  await forms.forms.batchUpdate({
+    formId: id,
+    requestBody: {
+      includeFormInResponse: false,
+      requests: requests,
+      writeControl: {
+        requiredRevisionId: newRevisionId
+      }
+    }
+  });
 }
 
 // Ustawienie portu, na którym serwer nasłuchuje

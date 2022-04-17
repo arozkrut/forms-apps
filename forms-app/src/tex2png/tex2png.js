@@ -24,6 +24,8 @@ module.exports = function (jsonForm, id){
       }
     }
 
+    if(startedJobs == 0) resolve({});
+
     const exitFun = (exitCode) => {
       if(exitCode != 0){
         resolve(null);
@@ -44,7 +46,7 @@ module.exports = function (jsonForm, id){
         if(qst[i].answers && qst[i].answers.length > 0) {
           for(var j in qst[i].answers) {
             if(qst[i].answers[j].tex) {
-              const python = spawn('python3', [ './src/tex2png/tex2png.py', qst[i].answers[j].answer, id + 'question' + i + 'answer' + j ]);
+              const python = spawn('python3', [ './src/tex2png/tex2png.py', qst[i].answers[j].text, id + 'question' + i + 'answer' + j ]);
               python.stdout.on('data', (data) => {
                 links['q' + i + 'a' + j] = data.toString();
               });
