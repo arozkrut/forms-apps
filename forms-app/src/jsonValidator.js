@@ -29,40 +29,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 module.exports = function (json){
-  return new Promise((resolve) => {
-    var Validator = require('jsonschema').Validator;
-    var validator = new Validator();
-    //schemat pytania:
-    var question = {
-      "id": "/question",
-      "type": "object",
-      "required": [ "type", "text", "tex" ],
-      "properties": {
-        "type": {"type": "string", "enum": [ "checkBox", "grid", "text", "list" ]},
-        "text": {"type": "string"},
-        "tex": {"type": "boolean"},
-        "answers": { "type": "array", "items" : {
-          "text" : {"type" : "string"},
-          "tex": {"type": "boolean"},
-          "correct" : {"type" : "boolean"}
-          }
-        },
-        "points": {"type": "number"}
-      }
-    };
-    //schemat formularza
-    var schema = {
-      "id": "/schema",
-      "type": "object",
-      "required": [ "title", "questions" ],
-      "properties": {
-        "title": {"type": "string"},
-        "email": {"type": "string"},
-        "check": {"type": "boolean"},
-        "questions": {"type": "array", "items": {"$ref": "question"}}
-      }
-    };
-    validator.addSchema(question, '/question');
-    resolve( validator.validate(json, schema).valid );
-  });
+    return new Promise((resolve) => {
+        var Validator = require('jsonschema').Validator;
+        var validator = new Validator();
+        //schemat pytania:
+        var question = {
+            "id": "/question",
+            "type": "object",
+            "required": [ "type", "text", "tex" ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [ "checkBox", "grid", "text", "list" ]
+                },
+                "text": {"type": "string"},
+                "tex": {"type": "boolean"},
+                "answers": { "type": "array", "items" : {
+                    "text" : {"type" : "string"},
+                    "tex": {"type": "boolean"},
+                    "correct" : {"type" : "boolean"}
+                }
+                },
+                "points": {"type": "number"}
+            }
+        };
+        //schemat formularza
+        var schema = {
+            "id": "/schema",
+            "type": "object",
+            "required": [ "title", "questions" ],
+            "properties": {
+                "title": {"type": "string"},
+                "email": {"type": "string"},
+                "check": {"type": "boolean"},
+                "questions": {"type": "array", "items": {"$ref": "question"}}
+            }
+        };
+        validator.addSchema(question, '/question');
+        resolve( validator.validate(json, schema).valid );
+    });
 };

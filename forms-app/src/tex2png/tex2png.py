@@ -19,7 +19,10 @@ png = "assets/"+sys.argv[2]+".png"  # output
 bas = "assets/base64"+sys.argv[2]+".txt"  # base64 output
 
 # Tworzenie pliu .tex o odpowiedniej zawartości:
-template = open("src/tex2png/texTemplate.tex", "r")
+if 'answer' in sys.argv[2]:
+    template = open("src/tex2png/texAnswerTemplate.tex", "r")
+else:
+    template = open("src/tex2png/texTemplate.tex", "r")
 texContent = template.read().replace("%excercise%", sys.argv[1])
 
 texFile = open(tex,  "w")
