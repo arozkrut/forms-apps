@@ -42,7 +42,7 @@ async function updateTitle(forms, id, title, revisionId) {
     });
 }
     
-async function deleteAllFormItems(forms, id, items, revisionId) {
+export async function deleteAllFormItems(forms, id, items, revisionId) {
     var requests = [];
     for( var i = items - 1; i >= 0; i--) {
         requests.push({

@@ -19,7 +19,9 @@ import google from '@googleapis/forms';
 import { authenticate } from '@google-cloud/local-auth';
 import validation from './jsonValidator.js';
 import tex2png from './tex2png/tex2png.js';
-import { updateFormUsingJsonTemplate, saveForm } from './formsFunctions.js';
+import {
+    updateFormUsingJsonTemplate, saveForm, deleteAllFormItems,
+} from './formsFunctions.js';
 import cors from 'cors';
 import { Low, JSONFile } from 'lowdb';
 import { fileURLToPath } from 'url';
@@ -166,7 +168,6 @@ app.put('/forms/:id', async (req, res) => {
             res.status(err.status).send(err.message);
         }
         else {
-            console.log('WESZLO');
             console.log('\x1b[31m', 'ERROR: server returned error');
             console.error(err);
             res.status(500).send(err);
@@ -216,9 +217,46 @@ app.get('/forms/:id/answers', async (req, res) => {
         res.status(200).send(answers);
     }
     catch( err ){
-        console.log('\x1b[31m', 'ERROR: form was not found');
+        console.log('\x1b[31m', 'ERROR: something went wrong');
         console.error(err);
-        res.status(404).send(err);
+        res.status(500).send(err);
+    }
+});
+
+app.delete('/forms/:id', async (req, res) => {
+    const id = req.params.id;
+    console.log(
+        '[DELETE] /forms/id/answers: delete form with given id'
+    );
+
+    if(!id || id === ''){
+        console.log('\x1b[31m', 'ERROR: wrong id');
+        res.status(400).send('ERROR: wrong id');
+        return;
+    }
+
+    try {
+        const formInfo = await forms.forms.get({
+            formId: id,
+        });
+
+        if(formInfo.data.items && formInfo.data.items.length != 0) {
+            await deleteAllFormItems(
+                forms, id, formInfo.data.items.length, formInfo.data.revisionId
+            );
+        }
+
+        db.data.forms[id] = undefined;
+        await db.write();
+
+        res.status(200).send('Form was deleted from local files \
+        and all items in Google Form were deleted but there is \
+        still a file in your Google Drive');
+    }
+    catch( err ){
+        console.log('\x1b[31m', 'ERROR: something went wrong');
+        console.error(err);
+        res.status(500).send(err);
     }
 });
 
@@ -231,7 +269,7 @@ app.get('/forms/:id/answers', async (req, res) => {
 // TODO: cropping pictures
 // TODO: zacznij pisać tekst
 // TODO: zacznij pisać o jakichś problemach np. dlaczego dwa pliki tex,
-// jaka baza danch
+// jaka baza danch, google drive i formsy na nim (nic z nimi nie robimy)
 // TODO: pomyśl o strukturze
 // lista imion i nazwisk z adresami email (dodaj przycisk)
 
