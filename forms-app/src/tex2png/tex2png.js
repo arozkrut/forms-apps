@@ -3,9 +3,9 @@
   Zwracana jest konstrukcja Promise.
   Funkcja wykorzystuje moduł child_process.
 */
-const {spawn} = require('child_process');
+import { spawn } from 'child_process';
 
-module.exports = function (jsonForm, id){
+function tex2png(jsonForm, id){
     return new Promise((resolve) => {
 
         var qst = jsonForm.questions;
@@ -83,4 +83,6 @@ module.exports = function (jsonForm, id){
             }
         }
     });
-};
+}
+
+export default tex2png;

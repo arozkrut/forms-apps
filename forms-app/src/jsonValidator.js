@@ -28,9 +28,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-module.exports = function (json){
+import { Validator } from 'jsonschema';
+function validation(json){
     return new Promise((resolve) => {
-        var Validator = require('jsonschema').Validator;
         var validator = new Validator();
         //schemat pytania:
         var question = {
@@ -60,7 +60,6 @@ module.exports = function (json){
             "required": [ "title", "questions" ],
             "properties": {
                 "title": {"type": "string"},
-                "email": {"type": "string"},
                 "check": {"type": "boolean"},
                 "questions": {"type": "array", "items": {"$ref": "question"}}
             }
@@ -68,4 +67,6 @@ module.exports = function (json){
         validator.addSchema(question, '/question');
         resolve( validator.validate(json, schema).valid );
     });
-};
+}
+
+export default validation;

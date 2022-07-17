@@ -12,34 +12,51 @@
  * body-parser - dostępne na podstawie licencji MIT
 */
 
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
-const google = require('@googleapis/forms');
-const {authenticate} = require('@google-cloud/local-auth');
-const validation = require('./jsonValidator.js');
-const tex2png = require('./tex2png/tex2png.js');
-const formsFunctions = require('./formsFunctions');
-var cors = require('cors');
+import express from 'express';
+import { join, dirname } from 'path';
+import bodyParser from 'body-parser';
+import google from '@googleapis/forms';
+import { authenticate } from '@google-cloud/local-auth';
+import validation from './jsonValidator.js';
+import tex2png from './tex2png/tex2png.js';
+import { updateFormUsingJsonTemplate, saveForm } from './formsFunctions.js';
+import cors from 'cors';
+import { Low, JSONFile } from 'lowdb';
+import { fileURLToPath } from 'url';
 
 const app = express();
 const port = 9090;
 app.use(cors());
 app.use(bodyParser.json());
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Use JSON file for storage
+const file = join(__dirname, 'database/db.json');
+const adapter = new JSONFile(file);
+const db = new Low(adapter);
+
 var auth, forms;
 async function quickstart() {
     auth = await authenticate({
     // eslint-disable-next-line no-undef
-        keyfilePath: path.join(__dirname, 'credentials/credentials.json'),
-        scopes: 'https://www.googleapis.com/auth/forms.body',
+        keyfilePath: join(__dirname, 'credentials/credentials.json'),
+        scopes: [
+            'https://www.googleapis.com/auth/forms.body',
+            'https://www.googleapis.com/auth/forms.responses.readonly'
+        ],
     });
     forms = google.forms({
         version: 'v1',
         auth: auth,
     });
+
+    // Read data from JSON file, this will set db.data content
+    await db.read();
+    db.data = db.data || { forms: {} };
 }
 quickstart();
+
 
 app.get('/forms/:id', async (req, res) => {
     const id = req.params.id;
@@ -47,7 +64,7 @@ app.get('/forms/:id', async (req, res) => {
 
     if(!id || id === ''){
         console.log('\x1b[31m', 'ERROR: wrong id');
-        res.status(400).end();
+        res.status(400).send('ERROR: wrong id');
         return;
     }
 
@@ -135,11 +152,13 @@ app.put('/forms/:id', async (req, res) => {
             };
         }
 
-        await formsFunctions.updateFormUsingJsonTemplate(
+        const response = await updateFormUsingJsonTemplate(
             forms, id, jsonTemplate, links, formInfo.data
         );
 
-        res.status(200).send("OK");
+        await saveForm(db, response.data.form, jsonTemplate);
+
+        res.send(response);
     }
     catch(err) {
         if ( err.customName ) {
@@ -147,19 +166,74 @@ app.put('/forms/:id', async (req, res) => {
             res.status(err.status).send(err.message);
         }
         else {
+            console.log('WESZLO');
             console.log('\x1b[31m', 'ERROR: server returned error');
             console.error(err);
-            res.status(404).send(err);
+            res.status(500).send(err);
         }
     }
 });
 
+
+app.get('/forms/:id/answers', async (req, res) => {
+    const id = req.params.id;
+    console.log(
+        '[GET] /forms/id/answers: get all answers submitted \
+         to form  \'', id, '\''
+    );
+
+    if(!id || id === ''){
+        console.log('\x1b[31m', 'ERROR: wrong id');
+        res.status(400).send('ERROR: wrong id');
+        return;
+    }
+
+    try {
+        var answers = [];
+        var pageToken;
+
+        var response = await forms.forms.responses.list({
+            // Required. ID of the Form whose responses to list.
+            formId: id,
+        });
+
+        console.log(response);
+
+        answers = answers.concat(response.data.responses);
+
+        while(response.data.nextPageToken) {
+            pageToken = response.data.nextPageToken;
+
+            response = await forms.forms.responses.list({
+                // Required. ID of the Form whose responses to list.
+                formId: id,
+                pageToken: pageToken
+            });
+
+            answers = answers.concat(response.data.responses);
+        }
+
+        res.status(200).send(answers);
+    }
+    catch( err ){
+        console.log('\x1b[31m', 'ERROR: form was not found');
+        console.error(err);
+        res.status(404).send(err);
+    }
+});
+
+// TODO: add delete request
 // TODO: add fields for:
 // TODO: form description
 // TODO: suffling questions and answers
 // TODO: remove email field
 // TODO: grading tests
 // TODO: cropping pictures
+// TODO: zacznij pisać tekst
+// TODO: zacznij pisać o jakichś problemach np. dlaczego dwa pliki tex,
+// jaka baza danch
+// TODO: pomyśl o strukturze
+// lista imion i nazwisk z adresami email (dodaj przycisk)
 
 
 // Ustawienie portu, na którym serwer nasłuchuje
