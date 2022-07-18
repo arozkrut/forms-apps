@@ -61,6 +61,7 @@ function validation(json){
             "properties": {
                 "title": {"type": "string"},
                 "check": {"type": "boolean"},
+                "description": {"type": "string"},
                 "questions": {"type": "array", "items": {"$ref": "question"}}
             }
         };

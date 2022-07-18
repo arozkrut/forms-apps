@@ -260,9 +260,7 @@ app.delete('/forms/:id', async (req, res) => {
     }
 });
 
-// TODO: add delete request
 // TODO: add fields for:
-// TODO: form description
 // TODO: suffling questions and answers
 // TODO: remove email field
 // TODO: grading tests

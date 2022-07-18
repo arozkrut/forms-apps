@@ -2,9 +2,11 @@ export async function updateFormUsingJsonTemplate(
     forms, id, jsonTemplate, links, formInfo
 ) {
 
-    if ( jsonTemplate.title != formInfo.info.title ) {
-        await updateTitle(
-            forms, id, jsonTemplate.title, formInfo.revisionId
+    if ( jsonTemplate.title != formInfo.info.title ||
+        (jsonTemplate.description && 
+        jsonTemplate.description != formInfo.info.description) ) {
+        await updateFormInfo(
+            forms, id, jsonTemplate, formInfo.revisionId
         );
     }
     
@@ -22,7 +24,7 @@ export async function updateFormUsingJsonTemplate(
     );
 }
     
-async function updateTitle(forms, id, title, revisionId) {
+async function updateFormInfo(forms, id, jsonTemplate, revisionId) {
     await forms.forms.batchUpdate({
         formId: id,
         requestBody: {
@@ -30,9 +32,10 @@ async function updateTitle(forms, id, title, revisionId) {
             requests: [ {
                 updateFormInfo: {
                     info: {
-                        title: title
+                        title: jsonTemplate.title,
+                        description: jsonTemplate.description,
                     },
-                    updateMask: "title"
+                    updateMask: "title,description"
                 }
             } ],
             writeControl: {
