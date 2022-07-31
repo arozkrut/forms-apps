@@ -6,25 +6,24 @@ export async function updateFormUsingJsonTemplate(
         (jsonTemplate.description && 
         jsonTemplate.description != formInfo.info.description) ) {
         await updateFormInfo(
-            forms, id, jsonTemplate, formInfo.revisionId
+            forms, id, jsonTemplate
         );
     }
     
-    var newRevisionId = formInfo.revisionId;
     if(formInfo.items) {
-        newRevisionId = await deleteAllFormItems(
-            forms, id, formInfo.items.length, formInfo.revisionId
+        await deleteAllFormItems(
+            forms, id, formInfo.items.length
         );
     }
 
     console.log(links);
     
     return await addItemsToForm(
-        forms, id, jsonTemplate, links, newRevisionId
+        forms, id, jsonTemplate, links
     );
 }
     
-async function updateFormInfo(forms, id, jsonTemplate, revisionId) {
+async function updateFormInfo(forms, id, jsonTemplate) {
     await forms.forms.batchUpdate({
         formId: id,
         requestBody: {
@@ -38,14 +37,11 @@ async function updateFormInfo(forms, id, jsonTemplate, revisionId) {
                     updateMask: "title,description"
                 }
             } ],
-            writeControl: {
-                requiredRevisionId: revisionId
-            }
         }
     });
 }
     
-export async function deleteAllFormItems(forms, id, items, revisionId) {
+export async function deleteAllFormItems(forms, id, items) {
     var requests = [];
     for( var i = items - 1; i >= 0; i--) {
         requests.push({
@@ -62,9 +58,6 @@ export async function deleteAllFormItems(forms, id, items, revisionId) {
         requestBody: {
             includeFormInResponse: true,
             requests: requests,
-            writeControl: {
-                targetRevisionId: revisionId
-            }
         }
     });
     
@@ -72,7 +65,7 @@ export async function deleteAllFormItems(forms, id, items, revisionId) {
 }
     
 async function addItemsToForm(
-    forms, id, jsonTemplate, links, newRevisionId
+    forms, id, jsonTemplate, links
 ) {
     const choiceQuestion = (q, index, type) => ({
         choiceQuestion: {
@@ -203,9 +196,6 @@ async function addItemsToForm(
         requestBody: {
             includeFormInResponse: true,
             requests: requests,
-            writeControl: {
-                targetRevisionId: newRevisionId
-            }
         }
     });
 }

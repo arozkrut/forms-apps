@@ -261,8 +261,8 @@ app.delete('/forms/:id', async (req, res) => {
 });
 
 // TODO: add fields for:
-// TODO: suffling questions and answers
-// TODO: remove email field
+// TODO: suffling questions and answers,
+// update: can't find property to shuffle questions
 // TODO: grading tests
 // TODO: cropping pictures
 // TODO: zacznij pisać tekst
