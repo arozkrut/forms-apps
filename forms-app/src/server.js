@@ -20,7 +20,10 @@ import { authenticate } from '@google-cloud/local-auth';
 import validation from './jsonValidator.js';
 import tex2png from './tex2png/tex2png.js';
 import {
-    updateFormUsingJsonTemplate, saveForm, deleteAllFormItems,
+    updateFormUsingJsonTemplate,
+    saveForm,
+    deleteAllFormItems,
+    getResponses
 } from './formsFunctions.js';
 import cors from 'cors';
 import { Low, JSONFile } from 'lowdb';
@@ -190,30 +193,7 @@ app.get('/forms/:id/answers', async (req, res) => {
     }
 
     try {
-        var answers = [];
-        var pageToken;
-
-        var response = await forms.forms.responses.list({
-            // Required. ID of the Form whose responses to list.
-            formId: id,
-        });
-
-        console.log(response);
-
-        answers = answers.concat(response.data.responses);
-
-        while(response.data.nextPageToken) {
-            pageToken = response.data.nextPageToken;
-
-            response = await forms.forms.responses.list({
-                // Required. ID of the Form whose responses to list.
-                formId: id,
-                pageToken: pageToken
-            });
-
-            answers = answers.concat(response.data.responses);
-        }
-
+        const answers = await getResponses(forms, id);
         res.status(200).send(answers);
     }
     catch( err ){

@@ -62,8 +62,8 @@ function validation(json){
                 "title": {"type": "string"},
                 "check": {"type": "boolean"},
                 "description": {"type": "string"},
-                "startDate": {"type": "string"},
-                "endDate": {"type": "string"},
+                "startDate": {"type": "string", "format": "date-time"},
+                "endDate": {"type": "string", "format": "date-time"},
                 "questions": {"type": "array", "items": {"$ref": "question"}}
             }
         };

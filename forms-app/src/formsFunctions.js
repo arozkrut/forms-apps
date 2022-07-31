@@ -229,3 +229,29 @@ export async function saveForm(db, form, jsonTemplate) {
     db.data.forms[form.formId] = jsonTemplate;
     await db.write();
 }
+
+export async function getResponses(forms, id) {
+    var answers = [];
+    var pageToken;
+
+    var response = await forms.forms.responses.list({
+        // Required. ID of the Form whose responses to list.
+        formId: id,
+    });
+
+    answers = answers.concat(response.data.responses);
+
+    while(response.data.nextPageToken) {
+        pageToken = response.data.nextPageToken;
+
+        response = await forms.forms.responses.list({
+            // Required. ID of the Form whose responses to list.
+            formId: id,
+            pageToken: pageToken
+        });
+
+        answers = answers.concat(response.data.responses);
+    }
+
+    return answers;
+}
