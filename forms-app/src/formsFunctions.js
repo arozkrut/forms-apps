@@ -271,7 +271,6 @@ function findCorrectAnswers(answersTemplate) {
 }
 
 function evaluateAnswer(questionTemplate, answers) {
-    console.log("type", questionTemplate.type);//TODO:
     if(questionTemplate.type === 'list'){
         const answer = answers[0].value;
         const correctAnswers = findCorrectAnswers(questionTemplate.answers);
@@ -306,11 +305,9 @@ function evaluateAnswer(questionTemplate, answers) {
                 : correctlyChosen - incorrectlyChosen
         ];
     } else if (questionTemplate.type === 'grid') {
-        console.log('grid'); //TODO:
         var correctAnswers = 0;
         questionTemplate.answers.forEach((answerTemplate) => {
             const answer = answers[answerTemplate.questionId];
-            console.log(answer); //TODO:
             if(answer && answer.textAnswers.answers && (
                 (answerTemplate.correct 
                 && answer.textAnswers.answers[0].value === 'Prawda')

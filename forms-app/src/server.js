@@ -29,6 +29,7 @@ import {
 import cors from 'cors';
 import { Low, JSONFile } from 'lowdb';
 import { fileURLToPath } from 'url';
+import { Workbook } from 'excel4node';
 
 const app = express();
 const port = 9090;
@@ -204,6 +205,36 @@ app.get('/forms/:id/answers', async (req, res) => {
     }
 });
 
+function evaluate(id, answers) {
+    if(db.data.forms[id].startDate) {
+        const startDate = new Date(db.data.forms[id].startDate).getTime();
+        answers = answers.filter(
+            (answer) => 
+                new Date(answer.lastSubmittedTime).getTime() >= startDate
+        );
+    }
+    if(db.data.forms[id].endDate) {
+        const endDate = new Date(db.data.forms[id].endDate).getTime();
+        answers = answers.filter(
+            (answer) => 
+                new Date(answer.lastSubmittedTime).getTime() <= endDate
+        );
+    }
+
+    var scores = answers.map((response) => ({
+        respondentEmail: response.respondentEmail,
+        evaluation: evaluateAnswers(response, db.data.forms[id].questions),
+    }));
+
+    for(var i=0; i < scores.length; i++) {
+        scores[i].totalPoints = scores[i].evaluation.reduce(
+            (prev, curr) => prev + curr, 0);
+        
+    }
+
+    return scores;
+}
+
 app.get('/forms/:id/scores', async (req, res) => {
     const id = req.params.id;
     console.log(
@@ -218,33 +249,74 @@ app.get('/forms/:id/scores', async (req, res) => {
 
     try {
         var answers = await getResponses(forms, id);
-        if(db.data.forms[id].startDate) {
-            const startDate = new Date(db.data.forms[id].startDate).getTime();
-            answers = answers.filter(
-                (answer) => 
-                    new Date(answer.lastSubmittedTime).getTime() >= startDate
-            );
-        }
-        if(db.data.forms[id].endDate) {
-            const endDate = new Date(db.data.forms[id].endDate).getTime();
-            answers = answers.filter(
-                (answer) => 
-                    new Date(answer.lastSubmittedTime).getTime() <= endDate
-            );
-        }
-
-        var scores = answers.map((response) => ({
-            respondentEmail: response.respondentEmail,
-            evaluation: evaluateAnswers(response, db.data.forms[id].questions),
-        }));
-
-        for(var i=0; i < scores.length; i++) {
-            scores[i].totalPoints = scores[i].evaluation.reduce(
-                (prev, curr) => prev + curr, 0);
-            
-        }
+        const scores = evaluate(id, answers);
          
         res.status(200).send(scores);
+    }
+    catch( err ){
+        console.log('\x1b[31m', 'ERROR: something went wrong');
+        console.error(err);
+        res.status(500).send(err);
+    }
+});
+
+app.get('/forms/:id/scores/excel', async (req, res) => {
+    const id = req.params.id;
+    console.log(
+        '[GET] /forms/id/scores: get excel with test scores'
+    );
+
+    if(!id || id === ''){
+        console.log('\x1b[31m', 'ERROR: wrong id');
+        res.status(400).send('ERROR: wrong id');
+        return;
+    }
+
+    try {
+        var answers = await getResponses(forms, id);
+        const scores = evaluate(id, answers);
+
+        var wb = new Workbook();
+        var ws = wb.addWorksheet('Wyniki');
+        var headerStyle = wb.createStyle({
+            font: {
+                bold: true,
+            },
+            alignment: {
+                wrapText: true,
+                horizontal: 'center',
+            },
+            fill: {
+                type: 'pattern',
+                patternType: 'solid',
+                fgColor: '#66adff',
+            }
+        });
+        var emailStyle = wb.createStyle({
+            fill: {
+                type: 'pattern',
+                patternType: 'solid',
+                fgColor: '#e0ecff',
+            }
+        });
+        for (let i = 0; i < db.data.forms[id].questions.length; i++) {
+            ws.cell(1, i + 2).number(i + 1).style(headerStyle);
+        }
+        ws.cell(1, db.data.forms[id].questions.length + 2)
+            .string('Suma').style(headerStyle);
+        
+        for(let i = 0; i < scores.length; i++) {
+            ws.cell(i + 2, 1).string(scores[i].respondentEmail)
+                .style(emailStyle);
+            for(let j = 0; j < scores[i].evaluation.length; j++) {
+                ws.cell(i + 2, j + 2).number(scores[i].evaluation[j]);
+            }
+            ws.cell(i + 2, scores[i].evaluation.length + 2)
+                .number(scores[i].totalPoints);
+        }
+
+        await wb.write(`${__dirname}/excels/${id}.xlsx`);
+        res.status(200).sendFile(`${__dirname}/excels/${id}.xlsx`);
     }
     catch( err ){
         console.log('\x1b[31m', 'ERROR: something went wrong');
