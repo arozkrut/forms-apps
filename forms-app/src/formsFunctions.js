@@ -255,3 +255,93 @@ export async function getResponses(forms, id) {
 
     return answers;
 }
+
+function findCorrectAnswers(answersTemplate) {
+    var correctAnswers = [];
+    for(var i = 0; i < answersTemplate.length; i++) {
+        if(answersTemplate[i].correct) {
+            if(answersTemplate[i].tex){
+                correctAnswers.push(`option ${i}`);
+            } else {
+                correctAnswers.push(answersTemplate[i].text);
+            }
+        }
+    }
+    return correctAnswers;
+}
+
+function evaluateAnswer(questionTemplate, answers) {
+    console.log("type", questionTemplate.type);//TODO:
+    if(questionTemplate.type === 'list'){
+        const answer = answers[0].value;
+        const correctAnswers = findCorrectAnswers(questionTemplate.answers);
+
+        if(!correctAnswers || !correctAnswers.length || 
+            correctAnswers.length > 1) {
+            throw {
+                customName: "Evaluation Error",
+                message: `Correct answers in form template for question \
+                    ${questionTemplate.text} are incorrect`,
+                status: 500,
+            };
+        }
+
+        if(answer === correctAnswers[0]) {
+            return questionTemplate.points;
+        }
+        return 0;
+    } else if(questionTemplate.type === 'checkBox'){
+        const correctAnswers = findCorrectAnswers(questionTemplate.answers);
+
+        const correctlyChosen = answers.filter(
+            (answer) => correctAnswers.includes(answer.value)
+        ).length;
+        const incorrectlyChosen = answers.filter(
+            (answer) => !correctAnswers.includes(answer.value)
+        ).length;
+
+        return questionTemplate.pointsArray[
+            correctlyChosen - incorrectlyChosen < 0
+                ? 0
+                : correctlyChosen - incorrectlyChosen
+        ];
+    } else if (questionTemplate.type === 'grid') {
+        console.log('grid'); //TODO:
+        var correctAnswers = 0;
+        questionTemplate.answers.forEach((answerTemplate) => {
+            const answer = answers[answerTemplate.questionId];
+            console.log(answer); //TODO:
+            if(answer && answer.textAnswers.answers && (
+                (answerTemplate.correct 
+                && answer.textAnswers.answers[0].value === 'Prawda')
+                || (!answerTemplate.correct
+                && answer.textAnswers.answers[0].value === 'Fałsz')
+            )) {
+                correctAnswers += 1;
+            }
+        });
+
+        return questionTemplate.pointsArray[correctAnswers];
+    } else return 0;
+}
+
+export function evaluateAnswers(response, questionsTemplate) {
+    var score = [];
+    questionsTemplate.forEach((questionTemplate) => {
+        if(response.answers[questionTemplate.questionId]) {
+            const answers = 
+                response.answers[
+                    questionTemplate.questionId
+                ].textAnswers.answers;
+            const points = evaluateAnswer(questionTemplate, answers);
+            score.push(points);
+        } else if(questionTemplate.type === 'grid') {
+            const points = evaluateAnswer(questionTemplate, response.answers);
+            score.push(points);
+        } else {
+            score.push(0);
+        }
+        
+    });
+    return score;
+}

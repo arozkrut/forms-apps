@@ -50,7 +50,8 @@ function validation(json){
                     "correct" : {"type" : "boolean"}
                 }
                 },
-                "points": {"type": "number"}
+                "points": {"type": "number"},
+                "pointsArray": {"type": "array"}
             }
         };
         //schemat formularza

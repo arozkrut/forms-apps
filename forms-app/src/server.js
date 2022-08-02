@@ -23,7 +23,8 @@ import {
     updateFormUsingJsonTemplate,
     saveForm,
     deleteAllFormItems,
-    getResponses
+    getResponses,
+    evaluateAnswers
 } from './formsFunctions.js';
 import cors from 'cors';
 import { Low, JSONFile } from 'lowdb';
@@ -203,6 +204,55 @@ app.get('/forms/:id/answers', async (req, res) => {
     }
 });
 
+app.get('/forms/:id/scores', async (req, res) => {
+    const id = req.params.id;
+    console.log(
+        '[GET] /forms/id/scores: get test scores'
+    );
+
+    if(!id || id === ''){
+        console.log('\x1b[31m', 'ERROR: wrong id');
+        res.status(400).send('ERROR: wrong id');
+        return;
+    }
+
+    try {
+        var answers = await getResponses(forms, id);
+        if(db.data.forms[id].startDate) {
+            const startDate = new Date(db.data.forms[id].startDate).getTime();
+            answers = answers.filter(
+                (answer) => 
+                    new Date(answer.lastSubmittedTime).getTime() >= startDate
+            );
+        }
+        if(db.data.forms[id].endDate) {
+            const endDate = new Date(db.data.forms[id].endDate).getTime();
+            answers = answers.filter(
+                (answer) => 
+                    new Date(answer.lastSubmittedTime).getTime() <= endDate
+            );
+        }
+
+        var scores = answers.map((response) => ({
+            respondentEmail: response.respondentEmail,
+            evaluation: evaluateAnswers(response, db.data.forms[id].questions),
+        }));
+
+        for(var i=0; i < scores.length; i++) {
+            scores[i].totalPoints = scores[i].evaluation.reduce(
+                (prev, curr) => prev + curr, 0);
+            
+        }
+         
+        res.status(200).send(scores);
+    }
+    catch( err ){
+        console.log('\x1b[31m', 'ERROR: something went wrong');
+        console.error(err);
+        res.status(500).send(err);
+    }
+});
+
 app.delete('/forms/:id', async (req, res) => {
     const id = req.params.id;
     console.log(
@@ -244,12 +294,20 @@ app.delete('/forms/:id', async (req, res) => {
 // TODO: suffling questions and answers,
 // update: can't find property to shuffle questions
 // TODO: grading tests
+// punkty w template:
+// if list(radio): punkty w 'points'
+// if checkBox: array punktów za poprawnie wybrane: [0, 1, 2] lub [0, 0, 1]
+// (index to liczba poprawnie wybranych)
+// kara za wybranie nieprawidłowej: odejmujemy od liczby poprawnie wybranych 1
+// if grid: array punktów za poprawnie wybrane bez kar
 // TODO: cropping pictures
 // TODO: zacznij pisać tekst
 // TODO: zacznij pisać o jakichś problemach np. dlaczego dwa pliki tex,
 // jaka baza danch, google drive i formsy na nim (nic z nimi nie robimy)
 // TODO: pomyśl o strukturze
 // lista imion i nazwisk z adresami email (dodaj przycisk)
+// trzeba wejść i ręcznie kliknąć "zbieraj adresy e-mail", bo
+// google nie oferuje tego w API
 
 
 // Ustawienie portu, na którym serwer nasłuchuje
