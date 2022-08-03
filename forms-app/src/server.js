@@ -64,6 +64,19 @@ async function quickstart() {
 }
 quickstart();
 
+app.get('/forms', async (req, res) => {
+    console.log('[GET] /forms: get all forms in database');
+
+    try {
+        res.status(200).send(db.data.forms);
+    }
+    catch( err ){
+        console.log('\x1b[31m', 'ERROR: form was not found');
+        console.error(err);
+        res.status(404).send(err);
+    }
+});
+
 
 app.get('/forms/:id', async (req, res) => {
     const id = req.params.id;
