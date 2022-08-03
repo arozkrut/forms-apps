@@ -225,8 +225,8 @@ export async function saveForm(db, form, jsonTemplate) {
                 form.items[i].questionItem.question.questionId;
         }
     }
-
     db.data.forms[form.formId] = jsonTemplate;
+    db.data.forms[form.formId].responderUri = form.responderUri;
     await db.write();
 }
 

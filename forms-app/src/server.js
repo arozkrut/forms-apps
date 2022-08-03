@@ -68,7 +68,11 @@ app.get('/forms', async (req, res) => {
     console.log('[GET] /forms: get all forms in database');
 
     try {
-        res.status(200).send(db.data.forms);
+        var array = [];
+        for (const formId in db.data.forms) {
+            array.push(Object.assign(db.data.forms[formId], {id: formId}));
+        }          
+        res.status(200).send(array);
     }
     catch( err ){
         console.log('\x1b[31m', 'ERROR: form was not found');
@@ -121,7 +125,7 @@ app.post('/forms', async (req, res) => {
                     }
                 }
             });
-            res.send(apiRes);
+            res.send(apiRes.data);
             console.log('\x1b[32m', "OK");
         }
         catch(err) {
