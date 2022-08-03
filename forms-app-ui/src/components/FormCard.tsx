@@ -10,12 +10,20 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { pl } from 'date-fns/locale';
-import React, { ReactElement, useMemo, useState } from 'react';
+import React, {
+  Dispatch, ReactElement, SetStateAction, useMemo, useState,
+} from 'react';
 import { CodeBlock } from 'react-code-blocks';
 import FormTemplate from '../models/FormTemplate';
 
-function FormCard(props: {form: FormTemplate}): ReactElement {
-  const { form } = props;
+function FormCard(props: {
+  form: FormTemplate,
+  newEditForm: (
+    formTemplate: FormTemplate,
+    formattedTemplate: string,
+  ) => void,
+}): ReactElement {
+  const { form, newEditForm } = props;
   const [expandCode, setExpandCode] = useState<boolean>(false);
 
   const formatedTemplate = useMemo((): string => {
@@ -83,7 +91,7 @@ function FormCard(props: {form: FormTemplate}): ReactElement {
           <Button
             variant="outlined"
             onClick={
-              () => console.log('edytuj')
+              () => newEditForm(form, formatedTemplate)
             }
           >
             Edytuj

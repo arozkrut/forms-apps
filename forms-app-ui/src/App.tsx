@@ -16,6 +16,7 @@ import FormList from './components/FormList';
 import FormTemplate from './models/FormTemplate';
 import CreateDialog from './components/CreateDialog';
 import AddDialog from './components/AddDialog';
+import EditDialog from './components/EditDialog';
 
 function App(): ReactElement {
   const [formTemplates, setFormTemplates] = useState<FormTemplate[]>([]);
@@ -24,6 +25,10 @@ function App(): ReactElement {
   const [openCreate, setOpenCreate] = useState<boolean>(false);
   const [openAdd, setOpenAdd] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [editingForm, setEditingForm] = useState<FormTemplate | null>(null);
+  const [
+    formattedEditingForm, setFormattedEditingForm,
+  ] = useState<string | null>(null);
   useEffect(() => {
     setLoading(true);
     const client = axios.create({
@@ -112,6 +117,44 @@ function App(): ReactElement {
     }
   };
 
+  const handleSave = async (text: string): Promise<void> => {
+    const client = axios.create({
+      baseURL: 'http://localhost:9090',
+    });
+
+    setLoading(true);
+
+    try {
+      const template = JSON.parse(text);
+      if (!template.title) {
+        setAlertText('Należy podać tytuł');
+        setOpenAlert(true);
+      } else if (editingForm) {
+        await client.put(`/forms/${editingForm.id}`, template);
+        const response = await client.get('/forms');
+        setFormTemplates(response.data);
+      }
+    } catch (err) {
+      if (typeof err === 'string') {
+        setAlertText(err);
+      } else if (err instanceof Error) {
+        setAlertText(err.message);
+      }
+      setOpenAlert(true);
+    }
+    setEditingForm(null);
+    setFormattedEditingForm('');
+    setLoading(false);
+  };
+
+  const newEditForm = (
+    formTemplate: FormTemplate,
+    formattedTemplate: string,
+  ):void => {
+    setEditingForm(formTemplate);
+    setFormattedEditingForm(formattedTemplate);
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       {!loading && (
@@ -148,7 +191,10 @@ function App(): ReactElement {
               </Stack>
             </ListSubheader>
             <ListItem>
-              <FormList formTemplates={formTemplates} />
+              <FormList
+                formTemplates={formTemplates}
+                newEditForm={newEditForm}
+              />
             </ListItem>
           </List>
 
@@ -162,6 +208,13 @@ function App(): ReactElement {
             open={openAdd}
             handleAdd={handleAdd}
             handleClose={() => setOpenAdd(false)}
+          />
+
+          <EditDialog
+            open={editingForm !== null}
+            handleSave={handleSave}
+            handleClose={() => setEditingForm(null)}
+            template={formattedEditingForm || ''}
           />
         </>
       )}
