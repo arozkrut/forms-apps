@@ -1,359 +1,399 @@
-/*Plik zawierający implementację serwera lokalnego.
-* app - aplikacja serwerowa
-* port - stała, numer portu serwera
-* jsonForm - zmienna przechowująca zakodowany formularz
-
-
-Serwer korzysta z kilku bibliotek:
-* express
-* fs - file system
-* cors - dostępne na podstawie licencji MIT
-* https
-* body-parser - dostępne na podstawie licencji MIT
+/* Plik zawierający implementację serwera lokalnego.
+ * app - aplikacja serwerowa
+ * port - stała, numer portu serwera
+ * jsonForm - zmienna przechowująca zakodowany formularz
 */
-const express = require('express');
-const fs = require('fs');
-var cors = require('cors');
-var https = require('https');
-const bodyParser = require('body-parser');
-const app = express()
+
+/* Serwer korzysta z kilku bibliotek:
+ * express
+ * fs - file system
+ * cors - dostępne na podstawie licencji MIT
+ * https
+ * body-parser - dostępne na podstawie licencji MIT
+*/
+
+import express from 'express';
+import { join, dirname } from 'path';
+import bodyParser from 'body-parser';
+import google from '@googleapis/forms';
+import { authenticate } from '@google-cloud/local-auth';
+import validation from './jsonValidator.js';
+import tex2png from './tex2png/tex2png.js';
+import {
+    updateFormUsingJsonTemplate,
+    saveForm,
+    deleteAllFormItems,
+    getResponses,
+    evaluateAnswers
+} from './formsFunctions.js';
+import cors from 'cors';
+import { Low, JSONFile } from 'lowdb';
+import { fileURLToPath } from 'url';
+import { Workbook } from 'excel4node';
+
+const app = express();
 const port = 9090;
 app.use(cors());
 app.use(bodyParser.json());
-var jsonForm;
 
-const path = require('path');
-const google = require('@googleapis/forms');
-const {authenticate} = require('@google-cloud/local-auth');
-// https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fforms.body&response_type=code&client_id=633298823771-e73621214nof0652fcai6sc9jb5lq3gt.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth2callback&flowName=GeneralOAuthFlow
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Use JSON file for storage
+const file = join(__dirname, 'database/db.json');
+const adapter = new JSONFile(file);
+const db = new Low(adapter);
 
 var auth, forms;
 async function quickstart() {
-  auth = await authenticate({
-    keyfilePath: path.join(__dirname, 'credentials/credentials.json'),
-    scopes: 'https://www.googleapis.com/auth/forms.body',
-  });
-  forms = google.forms({
-    version: 'v1',
-    auth: auth,
-  });
+    auth = await authenticate({
+    // eslint-disable-next-line no-undef
+        keyfilePath: join(__dirname, 'credentials/credentials.json'),
+        scopes: [
+            'https://www.googleapis.com/auth/forms.body',
+            'https://www.googleapis.com/auth/forms.responses.readonly'
+        ],
+    });
+    forms = google.forms({
+        version: 'v1',
+        auth: auth,
+    });
+
+    // Read data from JSON file, this will set db.data content
+    await db.read();
+    db.data = db.data || { forms: {} };
 }
 quickstart();
 
-/*Metoda makeRequest odpowiedzialna za komunikację międzyserwerową.
-* options - opcje odwołania (dokładny opis klasy w dokumentacji biblioteki https)
-* data - dane do przesłania
-Metoda zwraca konstrukcję Promise.
-*/
-function makeRequest(options, data) {
-  return new Promise((resolve) => {
-    const request = https.request(options, res => {
+app.get('/forms', async (req, res) => {
+    console.log('[GET] /forms: get all forms in database');
 
-      //Obsługa przekierowania:
-      if(res.statusCode >= 301 && res.statusCode<=308){
-        console.log("Request redirected:" +res.headers.location);
-        const newOpt ={
-          hostname: 'script.googleusercontent.com',
-          path:  res.headers.location.substring(36),
-          method: 'GET'
-        }
-        makeRequest(newOpt, "").then((value) => {resolve(value)});
-      }
-      else if(res.statusCode==200){
-        //Obsługa odpowiedzi z serwera Google'owego
-        res.on('data', (chunk) => {
-          console.log(`Request resolved with data: ${chunk}`);
-          resolve(chunk);
+    try {
+        res.status(200).send(db.data.forms);
+    }
+    catch( err ){
+        console.log('\x1b[31m', 'ERROR: form was not found');
+        console.error(err);
+        res.status(404).send(err);
+    }
+});
+
+
+app.get('/forms/:id', async (req, res) => {
+    const id = req.params.id;
+    console.log('[GET] /forms: get info about the form \'', id, '\'');
+
+    if(!id || id === ''){
+        console.log('\x1b[31m', 'ERROR: wrong id');
+        res.status(400).send('ERROR: wrong id');
+        return;
+    }
+
+    try {
+        const response = await forms.forms.get({
+            formId: id,
         });
-        }
-      else {
-        //Obsługa pozostałych przypadków
-        console.log(`Request resolved with status: ${res.statusCode}`);
-        resolve ("Server error");
-      }
-    })
-    //Błąd odwołania
-    request.on('error', error => {
-      console.error( error)
-    })
-    //Wysyłane dane (używane przy metodzie POST - generowanie nowego formularza)
-    request.write(data);
-    request.end();
- });
-}
+        res.send(response);
+    }
+    catch( err ){
+        console.log('\x1b[31m', 'ERROR: form was not found');
+        console.error(err);
+        res.status(404).send(err);
+    }
+});
 
 
 app.post('/forms', async (req, res) => {
-  const title = req.body.title;
-  console.log('[REQEST] /forms: create form with title \'', title, '\'')
-  if(!title || typeof title !== 'string'){
-    res.status(400).end();
-  }
-  else {
-    const apiRes = forms.forms.create(
-      {
-        requestBody: {
-          info: {
-            title: title
-          }
-        }
-      }
+    const title = req.body.title;
+    console.log(
+        '[POST] /forms: create a new form with the title \'', title, '\''
     );
-    
-    res.send(apiRes);
-  }
+
+    if(!title || typeof title !== 'string'){
+        console.log('\x1b[31m', 'ERROR: wrong title');
+        res.status(400).end();
+    }
+    else {
+        try {
+            const apiRes = await forms.forms.create({
+                requestBody: {
+                    info: {
+                        title: title
+                    }
+                }
+            });
+            res.send(apiRes);
+            console.log('\x1b[32m', "OK");
+        }
+        catch(err) {
+            console.log('\x1b[31m', 'ERROR: something went wrong');
+            console.error(err);
+            res.status(400).send(err);
+        }
+    }
 });
 
 
 app.put('/forms/:id', async (req, res) => {
-  const id = req.params.id
-  if(!id || id === ''){
-    res.status(400).end();
-  }
-  else {
-    const apiRes = await forms.forms.batchUpdate({
-      // Required. The form ID.
-      formId: id,
+    const id = req.params.id;
+    console.log('[PUT] /forms: update the form \'', id, '\'');
 
-      // Request body metadata
-      requestBody: {
-        // request body parameters
-        includeFormInResponse: true,
-        // writeControl: {},
-        requests: [
-          {
-            // informacje o formularzu
-            /* updateFormInfo: {
-              info: {
-                description: "Some test form",
-              },
-              updateMask: '*',
-            }*/
-            // jedyne co tu siedzi to zmiana formularza w quiz
-            /* updateSettings: {
-              settings: {
-                quizSettings: {
-                  isQuiz: true,
-                }
-              },
-              updateMask: '*',
-            } */
-            createItem: {
-              item: {
-                title: 'new item',
-                description: 'new test item',
-                // one of the following
-                questionItem: {
-                  question: {
-                    required: false,
-                    choiceQuestion: {
-                      type: 'RADIO',
-                      options: [
-                        {
-                          value: 'option0',
-                          isOther: false,
-                        },
-                        {
-                          value: 'option1',
-                          isOther: false,
-                        }
-                      ]
-                    }
-                  },
-                  image: {
-                    sourceUri: 'https://photos.google.com/share/AF1QipMU54iXdbmFE8YBgFaKYs_bhzicKtzXMl34SBI310DxY2-Vh9xtufL56M423q4FIQ/photo/AF1QipMBeVplCuqX8kHPBtGbZsdYFI4hBPsGvwJ9hwfq?key=TUlmYTNzRzFaTVFRTUpHRGVXam1VNUxuRmdpSlFB'
-                  }
-                }
-              },
-              location: {
-                index: 0,
-              }
-            }
-          }
-          
-        ],
-      },
-    })
-    res.send(apiRes);
-  }
-});
+    if(!id || id === ''){
+        console.log('\x1b[31m', 'ERROR: wrong id');
+        res.status(400).end();
+        return;
+    }
 
-app.put('/forms/:id/json', async (req, res) => {
-  const id = req.params.id
-  if(!id || id === ''){
-    res.status(400).end();
-  }
-  else {
-    jsonForm = req.body;
-    //Walidacja pliku:
-    const validation = require('./jsonValidator.js')
-    validation(jsonForm).then((valid) => {
-      var data='';
-      if(valid){
+    // * check if form exists
+    try {
+        const formInfo = await forms.forms.get({
+            formId: id,
+        });
 
-        //Konwersja latex'a do zdjęć
-        const tex2png = require('./tex2png/tex2png.js');
-        tex2png(jsonForm).then((stat) => {
+        const jsonTemplate = req.body;
 
-          if(stat) {
-            res.status(200).send('OK');
-          }
-          else {
-            res.status(400).send('Latex conversion failed');
-          }
-        }).catch({});
-      }
-      else{
-        res.status(400).send('Wrong JSON format');
-      }
-    }).catch({})
-    req.on('error', error => {
-      res.status(400).send("Server error: " + error);
-    })
-  }
-})
+        // * validate json
+        const valid = await validation(jsonTemplate);
+        if (!valid) {
+            throw {
+                customName: "NotValid",
+                message: "json template is not valid",
+                status: 400,
+            };
+        }
 
+        // * convert tex to png for each question and upload these images 
+        // * to imgur
+        const links = await tex2png(jsonTemplate, id);
+        if(!links) {
+            throw {
+                customName: "ConversionFailed",
+                message: "conversion to png or upload to Imgur failed",
+                status: 500,
+            };
+        }
 
-/*Definicja zachowania serwera na ścieżce ,,/uploadJsonFile''.
-  Ścieżka służy do przechwycenia kodowania JSON, sprawdzenia jego zgodności
-  ze schematem oraz konwersji wstawek matematycznych.
-*/
-app.post('/uploadJsonFile', (req, res) =>{
-  jsonForm = req.body;
-  console.log("Uploaded: ");
-  console.log(jsonForm);
-  //Walidacja pliku:
-  const validation = require('./jsonValidator.js')
-  validation(jsonForm).then((valid) => {
-    console.log("Validation finished");
-    var data='';
-    if(valid){
+        const response = await updateFormUsingJsonTemplate(
+            forms, id, jsonTemplate, links, formInfo.data
+        );
 
-      //Konwersja latex'a do zdjęć
-      const tex2png = require('./tex2png/tex2png.js');
-      tex2png(jsonForm).then((stat) => {
+        await saveForm(db, response.data.form, jsonTemplate);
 
-        if(stat) {
-          console.log("Conversion finished.");
-          res.set('Content-Type', 'text/html')
-          res.send(Buffer.from('<p>JSON validation and latex conversion succeded.</p>'));
+        res.send(response);
+    }
+    catch(err) {
+        if ( err.customName ) {
+            console.log('\x1b[31m', 'ERROR:' + err.message);
+            res.status(err.status).send(err.message);
         }
         else {
-          console.log("Conversion failed");
-          res.status(400).set('Content-Type', 'text/html').send(Buffer.from('<p>Latex conversion failed</p>'))
+            console.log('\x1b[31m', 'ERROR: server returned error');
+            console.error(err);
+            res.status(500).send(err);
         }
-      }).catch({});
     }
-    else{
-      res.status(400).set('Content-Type', 'text/html').send(Buffer.from('<p>Wrong JSON format</p>'))
+});
+
+
+app.get('/forms/:id/answers', async (req, res) => {
+    const id = req.params.id;
+    console.log(
+        '[GET] /forms/id/answers: get all answers submitted \
+         to form  \'', id, '\''
+    );
+
+    if(!id || id === ''){
+        console.log('\x1b[31m', 'ERROR: wrong id');
+        res.status(400).send('ERROR: wrong id');
+        return;
     }
-  }).catch({})
-  req.on('error', error => {
-    res.status(400).set('Content-Type', 'text/html').send(Buffer.from("Server error " +error));
-  })
-})
 
-
-
-/*Definicja zachowania serwera na ścieżce ,,/createForm''.
-  Ścieżka służy do komunikacji z aplikacją po stronie Google'a w celu
-  utworzenia nowego formularza.
-*/
-app.get('/createForm', (req, res) =>{
-  //Zamiana tekstu ze wstawkami w latex'u na zdjęcia kodowane w base64
-  for(var i in jsonForm.questions){
-    if(jsonForm.questions[i].tex){
-      try {
-        const data = fs.readFileSync('pictures/base64'+i+'.txt', 'utf8')
-        jsonForm.questions[i].text = data
-      } catch (err) {
-        console.error(err)
-      }
+    try {
+        const answers = await getResponses(forms, id);
+        res.status(200).send(answers);
     }
-  }
-
-
-  const encodedForm = JSON.stringify(jsonForm);
-
-  //Ustawienie parametrów odwołania HTTP
-  //Ścieżka dotyczy aplikacji internetowej umieszczonej na serwerach Google'a
-  var data = '';
-  const options = {
-    hostname: 'script.google.com',
-    path: '/macros/s/AKfycbxOJXEmayqgV858S6JfPJycVryYmkkpGqlvG_MM88rKRfy_C1Kt9JHD9h3eAmpCZX1wPA/exec',
-    method: 'POST',
-    headers: {
-     'Content-Type' : 'application/json',
-     'Content-Length': Buffer.from(encodedForm).length,
-     'Accept': '*/*'
-   }
-  }
-
-  console.log("REQUEST   :   "+ options.hostname+options.path);
-  //Wysłanie zapytania. Zwracana wartość to identyfikator nowoutworzonego formularza
-  makeRequest(options, encodedForm).then((newId) => {
-    //Ustawienie danych do obsługi utworzonych formularzy
-    const d = new Date();
-    const date =  d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
-    let newFormData = '{"id":"'+ newId+'", "date": "' +date +'", "name":"'+ jsonForm.title+'"}';
-
-    //Zmiany w pliku memoryFile.js:
-    let memory = fs.readFileSync('memoryFile.js', 'utf8');
-    let mem="";
-    if(memory[memory.length-4]=="'")  mem=JSON.parse(memory.substring(27, memory.length-4));
-    else  mem=JSON.parse(memory.substring(27, memory.length-3));
-    mem.forms.push(JSON.parse(newFormData));
-    let newMemory = "const memory = JSON.parse('"+JSON.stringify(mem)+"');";
-    fs.writeFile('memoryFile.js', Buffer.from(newMemory), (err) => {
-      if (err) throw err;
-      console.log('Memory file has been saved.');
-    });
-  }).then(() => {
-    res.status(200).set('Content-Type', 'text/html').send(Buffer.from("New form has been created. Please reload the page"));
-  }).catch(()=> {})
-})
-
-
-/*Definicja zachowania serwera na ścieżce ,,/getInfo''.
-  Ścieżka służy do komunikacji z aplikacją po stronie Google'a w celu
-  przetwarzania istniejących formularzy.
-*/
-app.get('/getInfo', (req, res) =>{
-  var encodedRequest ="formId="+req.query.formId+"&action="+req.query.action;
-  console.log("encodedRequest "+encodedRequest);
-  //Ustawienie parametrów wysyłanego zapytania
-  //Ścieżka dotyczy aplikacji internetowej umieszczonej na serwerach Google'a
-  const options = {
-    hostname: 'script.google.com',
-    path: '/macros/s/AKfycbxOJXEmayqgV858S6JfPJycVryYmkkpGqlvG_MM88rKRfy_C1Kt9JHD9h3eAmpCZX1wPA/exec?'+encodedRequest,
-    method: 'GET'
-  }
-  console.log("REQUEST   :   "+ options.hostname+options.path);
-  makeRequest(options, "").then((requestedData) =>{
-    if(req.query.action=='editorUrl' || req.query.action=='publisherUrl')
-      requestedData = '<a href="'+requestedData+'">'+requestedData+'</a>'
-    //Zarządzanie usuwaniem formularza z listy:
-    if(req.query.action=='delete'){
-      let memory = fs.readFileSync('memoryFile.js', 'utf8');
-      let mem="";
-      if(memory[memory.length-4]=="'")   mem=JSON.parse(memory.substring(27, memory.length-4));
-      else mem=JSON.parse(memory.substring(27, memory.length-3));
-      for(var i in mem.forms){
-        if( mem.forms[i].id == req.query.formId) delete mem.forms[i];
-      }
-      mem.forms = mem.forms.filter(function(x) { return x !== null });
-      let newMemory = "const memory = JSON.parse('"+JSON.stringify(mem)+"');";
-      fs.writeFile('memoryFile.js', Buffer.from(newMemory), (err) => {
-        if (err) throw err;
-        console.log('Memory file has been saved.');
-      });
+    catch( err ){
+        console.log('\x1b[31m', 'ERROR: something went wrong');
+        console.error(err);
+        res.status(500).send(err);
     }
-    res.status(200).set('Content-Type', 'text/html').send(Buffer.from(requestedData));
+});
 
-  }).catch(()=>{})
+function evaluate(id, answers) {
+    if(db.data.forms[id].startDate) {
+        const startDate = new Date(db.data.forms[id].startDate).getTime();
+        answers = answers.filter(
+            (answer) => 
+                new Date(answer.lastSubmittedTime).getTime() >= startDate
+        );
+    }
+    if(db.data.forms[id].endDate) {
+        const endDate = new Date(db.data.forms[id].endDate).getTime();
+        answers = answers.filter(
+            (answer) => 
+                new Date(answer.lastSubmittedTime).getTime() <= endDate
+        );
+    }
 
-})
+    var scores = answers.map((response) => ({
+        respondentEmail: response.respondentEmail,
+        evaluation: evaluateAnswers(response, db.data.forms[id].questions),
+    }));
+
+    for(var i=0; i < scores.length; i++) {
+        scores[i].totalPoints = scores[i].evaluation.reduce(
+            (prev, curr) => prev + curr, 0);
+        
+    }
+
+    return scores;
+}
+
+app.get('/forms/:id/scores', async (req, res) => {
+    const id = req.params.id;
+    console.log(
+        '[GET] /forms/id/scores: get test scores'
+    );
+
+    if(!id || id === ''){
+        console.log('\x1b[31m', 'ERROR: wrong id');
+        res.status(400).send('ERROR: wrong id');
+        return;
+    }
+
+    try {
+        var answers = await getResponses(forms, id);
+        const scores = evaluate(id, answers);
+         
+        res.status(200).send(scores);
+    }
+    catch( err ){
+        console.log('\x1b[31m', 'ERROR: something went wrong');
+        console.error(err);
+        res.status(500).send(err);
+    }
+});
+
+app.get('/forms/:id/scores/excel', async (req, res) => {
+    const id = req.params.id;
+    console.log(
+        '[GET] /forms/id/scores: get excel with test scores'
+    );
+
+    if(!id || id === ''){
+        console.log('\x1b[31m', 'ERROR: wrong id');
+        res.status(400).send('ERROR: wrong id');
+        return;
+    }
+
+    try {
+        var answers = await getResponses(forms, id);
+        const scores = evaluate(id, answers);
+
+        var wb = new Workbook();
+        var ws = wb.addWorksheet('Wyniki');
+        var headerStyle = wb.createStyle({
+            font: {
+                bold: true,
+            },
+            alignment: {
+                wrapText: true,
+                horizontal: 'center',
+            },
+            fill: {
+                type: 'pattern',
+                patternType: 'solid',
+                fgColor: '#66adff',
+            }
+        });
+        var emailStyle = wb.createStyle({
+            fill: {
+                type: 'pattern',
+                patternType: 'solid',
+                fgColor: '#e0ecff',
+            }
+        });
+        for (let i = 0; i < db.data.forms[id].questions.length; i++) {
+            ws.cell(1, i + 2).number(i + 1).style(headerStyle);
+        }
+        ws.cell(1, db.data.forms[id].questions.length + 2)
+            .string('Suma').style(headerStyle);
+        
+        for(let i = 0; i < scores.length; i++) {
+            ws.cell(i + 2, 1).string(scores[i].respondentEmail)
+                .style(emailStyle);
+            for(let j = 0; j < scores[i].evaluation.length; j++) {
+                ws.cell(i + 2, j + 2).number(scores[i].evaluation[j]);
+            }
+            ws.cell(i + 2, scores[i].evaluation.length + 2)
+                .number(scores[i].totalPoints);
+        }
+
+        await wb.write(`${__dirname}/excels/${id}.xlsx`);
+        res.status(200).sendFile(`${__dirname}/excels/${id}.xlsx`);
+    }
+    catch( err ){
+        console.log('\x1b[31m', 'ERROR: something went wrong');
+        console.error(err);
+        res.status(500).send(err);
+    }
+});
+
+app.delete('/forms/:id', async (req, res) => {
+    const id = req.params.id;
+    console.log(
+        '[DELETE] /forms/id/answers: delete form with given id'
+    );
+
+    if(!id || id === ''){
+        console.log('\x1b[31m', 'ERROR: wrong id');
+        res.status(400).send('ERROR: wrong id');
+        return;
+    }
+
+    try {
+        const formInfo = await forms.forms.get({
+            formId: id,
+        });
+
+        if(formInfo.data.items && formInfo.data.items.length != 0) {
+            await deleteAllFormItems(
+                forms, id, formInfo.data.items.length, formInfo.data.revisionId
+            );
+        }
+
+        db.data.forms[id] = undefined;
+        await db.write();
+
+        res.status(200).send('Form was deleted from local files \
+        and all items in Google Form were deleted but there is \
+        still a file in your Google Drive');
+    }
+    catch( err ){
+        console.log('\x1b[31m', 'ERROR: something went wrong');
+        console.error(err);
+        res.status(500).send(err);
+    }
+});
+
+// TODO: add fields for:
+// TODO: suffling questions and answers,
+// update: can't find property to shuffle questions
+// TODO: grading tests
+// punkty w template:
+// if list(radio): punkty w 'points'
+// if checkBox: array punktów za poprawnie wybrane: [0, 1, 2] lub [0, 0, 1]
+// (index to liczba poprawnie wybranych)
+// kara za wybranie nieprawidłowej: odejmujemy od liczby poprawnie wybranych 1
+// if grid: array punktów za poprawnie wybrane bez kar
+// TODO: cropping pictures
+// TODO: zacznij pisać tekst
+// TODO: zacznij pisać o jakichś problemach np. dlaczego dwa pliki tex,
+// jaka baza danch, google drive i formsy na nim (nic z nimi nie robimy)
+// TODO: pomyśl o strukturze
+// lista imion i nazwisk z adresami email (dodaj przycisk)
+// trzeba wejść i ręcznie kliknąć "zbieraj adresy e-mail", bo
+// google nie oferuje tego w API
 
 
-//Ustawienie portu, na którym serwer nasłuchuje
+// Ustawienie portu, na którym serwer nasłuchuje
 app.listen(port);
