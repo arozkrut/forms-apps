@@ -70,7 +70,9 @@ app.get('/forms', async (req, res) => {
     try {
         var array = [];
         for (const formId in db.data.forms) {
-            array.push(Object.assign(db.data.forms[formId], {id: formId}));
+            if(db.data.forms[formId]) {
+                array.push(Object.assign(db.data.forms[formId], {id: formId}));
+            }
         }          
         res.status(200).send(array);
     }

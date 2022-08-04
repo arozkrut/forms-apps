@@ -147,6 +147,32 @@ function App(): ReactElement {
     setLoading(false);
   };
 
+  const handleDelete = async (id: string): Promise<void> => {
+    const client = axios.create({
+      baseURL: 'http://localhost:9090',
+    });
+
+    setLoading(true);
+
+    console.log(id);
+
+    try {
+      if (id) {
+        await client.delete(`/forms/${id}`);
+        const response = await client.get('/forms');
+        setFormTemplates(response.data);
+      }
+    } catch (err) {
+      if (typeof err === 'string') {
+        setAlertText(err);
+      } else if (err instanceof Error) {
+        setAlertText(err.message);
+      }
+      setOpenAlert(true);
+    }
+    setLoading(false);
+  };
+
   const newEditForm = (
     formTemplate: FormTemplate,
     formattedTemplate: string,
@@ -194,6 +220,7 @@ function App(): ReactElement {
               <FormList
                 formTemplates={formTemplates}
                 newEditForm={newEditForm}
+                handleDelete={handleDelete}
               />
             </ListItem>
           </List>

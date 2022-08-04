@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { pl } from 'date-fns/locale';
 import React, {
-  Dispatch, ReactElement, SetStateAction, useMemo, useState,
+  ReactElement, useMemo, useState,
 } from 'react';
 import { CodeBlock } from 'react-code-blocks';
 import FormTemplate from '../models/FormTemplate';
@@ -22,8 +22,9 @@ function FormCard(props: {
     formTemplate: FormTemplate,
     formattedTemplate: string,
   ) => void,
+  handleDelete: (id: string) => Promise<void>,
 }): ReactElement {
-  const { form, newEditForm } = props;
+  const { form, newEditForm, handleDelete } = props;
   const [expandCode, setExpandCode] = useState<boolean>(false);
 
   const formatedTemplate = useMemo((): string => {
@@ -99,7 +100,7 @@ function FormCard(props: {
           <Button
             variant="outlined"
             onClick={
-              () => console.log('usuń')
+              () => handleDelete(form.id)
             }
           >
             Usuń

@@ -9,13 +9,19 @@ function FormList(props: {
     formTemplate: FormTemplate,
     formattedTemplate: string,
   ) => void,
+  handleDelete: (id: string) => Promise<void>,
 }): ReactElement {
-  const { formTemplates, newEditForm } = props;
+  const { formTemplates, newEditForm, handleDelete } = props;
   return (
     <Container>
       <Stack spacing={2} m={1}>
         {formTemplates.map((form) => (
-          <FormCard form={form} key={form.id} newEditForm={newEditForm} />
+          <FormCard
+            form={form}
+            key={form.id}
+            newEditForm={newEditForm}
+            handleDelete={handleDelete}
+          />
         ))}
       </Stack>
     </Container>
