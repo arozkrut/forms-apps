@@ -42,6 +42,7 @@ function CreateDialog(props: {
             value={text}
             onChange={handleChange}
             label="Template"
+            sx={{ mt: 1 }}
           />
         </Stack>
       </DialogContent>

@@ -106,7 +106,19 @@ function FormCard(props: {
               )
             }
           >
-            Otwórz formularz Google
+            Otwórz
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={
+              () => window.open(
+                `https://docs.google.com/forms/d/${form.id}/edit`,
+                '_blank',
+                'noopener,noreferrer',
+              )
+            }
+          >
+            Edytuj w Google
           </Button>
           <Button
             variant="outlined"
