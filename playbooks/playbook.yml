@@ -41,6 +41,32 @@
     - name: Install imgurpython
       pip:
         name: imgurpython
+        virtualenv: ~/env3
+        virtualenv_command: "{{ PYTHON }} -m venv"
+
+    - name: Install tex2pix
+      pip:
+        name: tex2pix
+        virtualenv: ~/env3
+        virtualenv_command: "{{ PYTHON }} -m venv"
+
+    - name: Install pdf2image
+      pip:
+        name: pdf2image
+        virtualenv: ~/env3
+        virtualenv_command: "{{ PYTHON }} -m venv"
+
+    - name: Install opencv-python
+      pip:
+        name: opencv-python
+        virtualenv: ~/env3
+        virtualenv_command: "{{ PYTHON }} -m venv"
+
+    - name: install poppler-utils
+      apt: 
+        name: poppler-utils
+        state: present
+      become: yes
 
     - name: install latex
       apt: 
