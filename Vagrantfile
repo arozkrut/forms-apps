@@ -16,13 +16,12 @@ Vagrant.configure(2) do |config|
     sudo DEBIAN_FRONTEND=noninteractive apt-get install ansible acl -qq > /dev/null
   SHELL
   config.vm.provision "ansible_local" do |ansible|
-    ansible.playbook = "playbooks/dev/playbook.yml"
+    ansible.playbook = "playbooks/playbook.yml"
   end
   config.vm.network :forwarded_port, guest: 80, host: 8001
-  config.vm.network :forwarded_port, guest: 8000, host: 8000
-  config.vm.network :forwarded_port, guest: 5432, host: 15432
   config.vm.network :forwarded_port, guest: 9090, host: 9090
   config.vm.network :forwarded_port, guest: 3000, host: 3000
+  config.vm.network :forwarded_port, guest: 9091, host: 9091
 
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
@@ -34,5 +33,5 @@ Vagrant.configure(2) do |config|
     # Fix Ubuntu Focal box issue: https://bugs.launchpad.net/cloud-images/+bug/1829625
     vb.customize [ "modifyvm", :id, "--uartmode1", "file", File::NULL ]
   end
-  config.vm.post_up_message = 'Please open this url and authenticate to Google: https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fforms.body&response_type=code&client_id=633298823771-e73621214nof0652fcai6sc9jb5lq3gt.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth2callback&flowName=GeneralOAuthFlow'
+  config.vm.post_up_message = 'Please open this url and authenticate to Google: https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fforms.body&response_type=code&client_id=633298823771-e73621214nof0652fcai6sc9jb5lq3gt.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth2callback&flowName=GeneralOAuthFlow and then open http://localhost:9091'
 end

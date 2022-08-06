@@ -1,0 +1,13 @@
+[Unit]
+Description=Start forms-app-ui server
+
+[Service]
+Restart=always
+User=vagrant
+Group=vagrant
+WorkingDirectory=/vagrant/forms-app-ui/
+ExecStart=npm start
+Type=simple
+
+[Install]
+WantedBy=vagrant.mount

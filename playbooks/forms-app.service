@@ -1,11 +1,11 @@
 [Unit]
-Description=Start proxy server
+Description=Start forms-app server
 
 [Service]
 Restart=always
 User=vagrant
 Group=vagrant
-WorkingDirectory=/vagrant/testy-proxy/
+WorkingDirectory=/vagrant/forms-app/
 ExecStart=node src/server.js
 Type=simple
 

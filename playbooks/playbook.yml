@@ -37,7 +37,22 @@
         state: latest
         virtualenv: ~/env3
         virtualenv_command: "{{ PYTHON }} -m venv"
-# TODO: add pip imgurpython and latex
+
+    - name: Install imgurpython
+      pip:
+        name: imgurpython
+
+    - name: install latex
+      apt: 
+        name: texlive-latex-recommended
+        state: present
+      become: yes
+
+    - name: install polish language
+      apt: 
+        name: texlive-lang-polish 
+        state: present
+      become: yes
 
     - name: set up nodejs sources
       shell: curl -fsSL https://deb.nodesource.com/setup_16.x | sudo bash -
@@ -49,14 +64,26 @@
         state: present
       become: yes
 
-    - name: install packages
+    - name: install packages forms-app
       shell: npm i
       args:
-        chdir: /vagrant/testy-proxy
+        chdir: /vagrant/forms-app
 
-    - name: Deploy proxy app
+    - name: install packages forms-app-ui
+      shell: npm i
+      args:
+        chdir: /vagrant/forms-app-ui
+
+    - name: Deploy forms-app
       copy:
-        src: proxy.service
+        src: forms-app.service
+        dest: /etc/systemd/system/
+        force: yes
+      become: yes
+
+    - name: Deploy forms-app-ui
+      copy:
+        src: forms-app-ui.service
         dest: /etc/systemd/system/
         force: yes
       become: yes
@@ -67,15 +94,16 @@
         daemon_reload: yes
       become: yes
 
-    - name: Enable and run proxy service
+    - name: Enable and run forms-app service
       service:
-        name: proxy
+        name: forms-app
         enabled: yes
         state: started
       become: yes
 
-#- name: Include playbook with postgres configuration
-#  import_playbook: postgres.yml
-
-#- name: Include playbook with services configuration
-#  import_playbook: services.yml
+    - name: Enable and run forms-app-ui service
+      service:
+        name: forms-app-ui
+        enabled: yes
+        state: started
+      become: yes
