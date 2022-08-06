@@ -15,8 +15,6 @@ export async function updateFormUsingJsonTemplate(
             forms, id, formInfo.items.length
         );
     }
-
-    console.log(links);
     
     return await addItemsToForm(
         forms, id, jsonTemplate, links
@@ -84,7 +82,7 @@ async function addItemsToForm(
                     : undefined,
                 isOther: false
             })),
-            shuffle: false
+            shuffle: jsonTemplate.shuffleAnswers,
         }
     });
     
@@ -166,7 +164,7 @@ async function addItemsToForm(
                             ],
                             shuffle: false,
                         },
-                        shuffleQuestions: false,
+                        shuffleQuestions: jsonTemplate.shuffleAnswers,
                     }
                 },
                 description: q.tex

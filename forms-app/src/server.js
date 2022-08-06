@@ -386,6 +386,8 @@ app.delete('/forms/:id', async (req, res) => {
 // TODO: add fields for:
 // TODO: suffling questions and answers,
 // update: can't find property to shuffle questions
+// jedyne co można to w opcjach przed startem zmienić
+// settings -> presentation -> Shuffle question order na on
 // TODO: grading tests
 // punkty w template:
 // if list(radio): punkty w 'points'

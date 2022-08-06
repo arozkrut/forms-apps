@@ -65,6 +65,7 @@ function validation(json){
                 "description": {"type": "string"},
                 "startDate": {"type": "string", "format": "date-time"},
                 "endDate": {"type": "string", "format": "date-time"},
+                "shuffleAnswers": {"type": "boolean"},
                 "questions": {"type": "array", "items": {"$ref": "question"}}
             }
         };
