@@ -256,6 +256,10 @@ export async function getResponses(forms, id) {
 
 export function parseAnswers(responses, questionsTemplate){
     for(let i=0; i < responses.length; i++) {
+        if(!responses[i].answers) {
+            responses[i].answers = [];
+            continue;
+        }
         let answers = [];
         questionsTemplate.forEach((questionTemplate) => {
             if(responses[i].answers[questionTemplate.questionId]) {

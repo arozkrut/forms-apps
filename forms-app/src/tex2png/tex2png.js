@@ -55,6 +55,9 @@ function tex2png(jsonForm, id){
                 pythonQuestion.stdout.on('data', (data) => {
                     links['q' + questionNumber] = data.toString();
                 });
+                pythonQuestion.stderr.on('data', function(data) {
+                    console.log('stderr: ' + data);
+                });
                 pythonQuestion.on('exit', exitFun);
             }
 
@@ -78,6 +81,9 @@ function tex2png(jsonForm, id){
                             ] = data.toString();
                         });
                         pythonAnswer.on('exit', exitFun);
+                        pythonAnswer.stderr.on('data', function(data) {
+                            console.log('stderr: ' + data);
+                        });
                     }
                 }
             }
