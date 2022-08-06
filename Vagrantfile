@@ -33,5 +33,5 @@ Vagrant.configure(2) do |config|
     # Fix Ubuntu Focal box issue: https://bugs.launchpad.net/cloud-images/+bug/1829625
     vb.customize [ "modifyvm", :id, "--uartmode1", "file", File::NULL ]
   end
-  config.vm.post_up_message = 'Please open this url and authenticate to Google: https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fforms.body&response_type=code&client_id=633298823771-e73621214nof0652fcai6sc9jb5lq3gt.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth2callback&flowName=GeneralOAuthFlow and then open http://localhost:9091'
+  config.vm.post_up_message = 'Please open this url and authenticate to Google: https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fforms.body%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fforms.responses.readonly&response_type=code&client_id=633298823771-e73621214nof0652fcai6sc9jb5lq3gt.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth2callback&service=lso&flowName=GeneralOAuthFlow and then open http://localhost:9091'
 end
