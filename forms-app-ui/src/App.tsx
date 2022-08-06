@@ -154,8 +154,6 @@ function App(): ReactElement {
 
     setLoading(true);
 
-    console.log(id);
-
     try {
       if (id) {
         await client.delete(`/forms/${id}`);
@@ -249,7 +247,7 @@ function App(): ReactElement {
         <Box
           sx={{ display: 'flex' }}
           justifyContent="center"
-          mt="45%"
+          mt="45vh"
         >
           <CircularProgress />
         </Box>

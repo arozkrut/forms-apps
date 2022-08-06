@@ -4,6 +4,8 @@ import {
   AccordionSummary,
   Box, Button, Card, CardContent, Typography,
   Stack,
+  Dialog,
+  CircularProgress,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // eslint-disable-next-line import/no-duplicates
@@ -14,6 +16,7 @@ import React, {
   ReactElement, useMemo, useState,
 } from 'react';
 import { CodeBlock } from 'react-code-blocks';
+import axios from 'axios';
 import FormTemplate from '../models/FormTemplate';
 
 function FormCard(props: {
@@ -26,6 +29,9 @@ function FormCard(props: {
 }): ReactElement {
   const { form, newEditForm, handleDelete } = props;
   const [expandCode, setExpandCode] = useState<boolean>(false);
+  const [code, setCode] = useState<string>('');
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const formatedTemplate = useMemo((): string => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,6 +52,19 @@ function FormCard(props: {
     }
     return JSON.stringify(template, null, 2);
   }, [form]);
+
+  const showResponses = (url: string):void => {
+    setLoading(true);
+    setShowDialog(true);
+    const client = axios.create({
+      baseURL: 'http://localhost:9090',
+    });
+
+    client.get(`/forms/${form.id}/${url}`).then((res) => {
+      setCode(JSON.stringify(res.data, null, 2));
+      setLoading(false);
+    });
+  };
 
   return (
     <Box>
@@ -109,19 +128,32 @@ function FormCard(props: {
             variant="outlined"
             color="secondary"
             onClick={
-              () => console.log('odpowiedzi')
+              () => showResponses('answers')
             }
           >
-            Pobierz odpowiedzi
+            odpowiedzi
           </Button>
           <Button
             variant="outlined"
             color="secondary"
             onClick={
-              () => console.log('odpowiedzi')
+              () => showResponses('scores')
             }
           >
-            Pobierz oceny
+            oceny JSON
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={
+              () => window.open(
+                `http://localhost:9090/forms/${form.id}/scores/excel`,
+                '_blank',
+                'noopener,noreferrer',
+              )
+            }
+          >
+            Pobierz EXCEL
           </Button>
         </Stack>
         <Accordion
@@ -145,6 +177,29 @@ function FormCard(props: {
           </AccordionDetails>
         </Accordion>
       </Card>
+      <Dialog
+        open={showDialog}
+        fullWidth
+        maxWidth="md"
+        onClose={() => setShowDialog(false)}
+      >
+        {loading && (
+        <Box
+          sx={{ display: 'flex' }}
+          justifyContent="center"
+          mt="35vh"
+          style={{ minHeight: '300px' }}
+        >
+          <CircularProgress />
+        </Box>
+        )}
+        {!loading && (
+          <CodeBlock
+            text={code}
+            language="json"
+          />
+        )}
+      </Dialog>
     </Box>
   );
 }

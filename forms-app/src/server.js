@@ -24,7 +24,8 @@ import {
     saveForm,
     deleteAllFormItems,
     getResponses,
-    evaluateAnswers
+    evaluateAnswers,
+    parseAnswers
 } from './formsFunctions.js';
 import cors from 'cors';
 import { Low, JSONFile } from 'lowdb';
@@ -215,7 +216,8 @@ app.get('/forms/:id/answers', async (req, res) => {
 
     try {
         const answers = await getResponses(forms, id);
-        res.status(200).send(answers);
+        const parsed = parseAnswers(answers, db.data.forms[id].questions);
+        res.status(200).send(parsed);
     }
     catch( err ){
         console.log('\x1b[31m', 'ERROR: something went wrong');
@@ -325,7 +327,7 @@ app.get('/forms/:id/scores/excel', async (req, res) => {
             .string('Suma').style(headerStyle);
         
         for(let i = 0; i < scores.length; i++) {
-            ws.cell(i + 2, 1).string(scores[i].respondentEmail)
+            ws.cell(i + 2, 1).string(scores[i].respondentEmail || '')
                 .style(emailStyle);
             for(let j = 0; j < scores[i].evaluation.length; j++) {
                 ws.cell(i + 2, j + 2).number(scores[i].evaluation[j]);
