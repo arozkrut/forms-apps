@@ -24,7 +24,8 @@ import {
     saveForm,
     deleteAllFormItems,
     getResponses,
-    evaluateAnswers
+    evaluateAnswers,
+    parseAnswers
 } from './formsFunctions.js';
 import cors from 'cors';
 import { Low, JSONFile } from 'lowdb';
@@ -68,7 +69,13 @@ app.get('/forms', async (req, res) => {
     console.log('[GET] /forms: get all forms in database');
 
     try {
-        res.status(200).send(db.data.forms);
+        var array = [];
+        for (const formId in db.data.forms) {
+            if(db.data.forms[formId]) {
+                array.push(Object.assign(db.data.forms[formId], {id: formId}));
+            }
+        }          
+        res.status(200).send(array);
     }
     catch( err ){
         console.log('\x1b[31m', 'ERROR: form was not found');
@@ -121,7 +128,7 @@ app.post('/forms', async (req, res) => {
                     }
                 }
             });
-            res.send(apiRes);
+            res.send(apiRes.data);
             console.log('\x1b[32m', "OK");
         }
         catch(err) {
@@ -209,7 +216,8 @@ app.get('/forms/:id/answers', async (req, res) => {
 
     try {
         const answers = await getResponses(forms, id);
-        res.status(200).send(answers);
+        const parsed = parseAnswers(answers, db.data.forms[id].questions);
+        res.status(200).send(parsed);
     }
     catch( err ){
         console.log('\x1b[31m', 'ERROR: something went wrong');
@@ -319,7 +327,7 @@ app.get('/forms/:id/scores/excel', async (req, res) => {
             .string('Suma').style(headerStyle);
         
         for(let i = 0; i < scores.length; i++) {
-            ws.cell(i + 2, 1).string(scores[i].respondentEmail)
+            ws.cell(i + 2, 1).string(scores[i].respondentEmail || '')
                 .style(emailStyle);
             for(let j = 0; j < scores[i].evaluation.length; j++) {
                 ws.cell(i + 2, j + 2).number(scores[i].evaluation[j]);

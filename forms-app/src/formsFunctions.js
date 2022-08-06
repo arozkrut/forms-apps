@@ -225,8 +225,8 @@ export async function saveForm(db, form, jsonTemplate) {
                 form.items[i].questionItem.question.questionId;
         }
     }
-
     db.data.forms[form.formId] = jsonTemplate;
+    db.data.forms[form.formId].responderUri = form.responderUri;
     await db.write();
 }
 
@@ -254,6 +254,54 @@ export async function getResponses(forms, id) {
     }
 
     return answers;
+}
+
+export function parseAnswers(responses, questionsTemplate){
+    for(let i=0; i < responses.length; i++) {
+        let answers = [];
+        questionsTemplate.forEach((questionTemplate) => {
+            if(responses[i].answers[questionTemplate.questionId]) {
+                if(questionTemplate.type === 'list'
+                    || questionTemplate.type === 'text'){
+                    const answer = responses[i]
+                        .answers[questionTemplate.questionId]
+                        .textAnswers.answers;
+            
+                    answers.push({
+                        question: questionTemplate.text,
+                        answer,
+                    });
+                } else if(questionTemplate.type === 'checkBox'){
+                    const questionAnswers = responses[i]
+                        .answers[questionTemplate.questionId]
+                        .textAnswers.answers;
+                    answers.push({
+                        question: questionTemplate.text,
+                        answers: questionAnswers,
+                    });
+                } else if (questionTemplate.type === 'grid') {
+                    const gridQuestions = [];
+                    questionTemplate.answers.forEach((answerTemplate) => {
+                        const answer = responses[i].answers[
+                            questionTemplate.questionId
+                        ].textAnswers.answers[0];
+                        gridQuestions.push({
+                            question: answerTemplate.text,
+                            answer,
+                        });
+                    });
+            
+                    answers.push({
+                        question: questionTemplate.text,
+                        gridAnswers: gridQuestions,
+                    });
+                }
+            }
+            
+        });
+        responses[i].answers = answers;
+    }
+    return responses;
 }
 
 function findCorrectAnswers(answersTemplate) {
