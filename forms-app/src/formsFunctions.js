@@ -248,14 +248,20 @@ export async function getResponses(forms, id) {
             pageToken: pageToken
         });
 
-        answers = answers.concat(response.data.responses);
+        answers = response.data.responses
+            ? answers.concat(response.data.responses)
+            : [];
     }
 
     return answers;
 }
 
 export function parseAnswers(responses, questionsTemplate){
+    if(!responses[0]){
+        return [];
+    }
     for(let i=0; i < responses.length; i++) {
+        console.log(!responses[0]);
         if(!responses[i].answers) {
             responses[i].answers = [];
             continue;

@@ -270,7 +270,7 @@ app.get('/forms/:id/scores', async (req, res) => {
 
     try {
         var answers = await getResponses(forms, id);
-        const scores = evaluate(id, answers);
+        const scores = answers[0] ? evaluate(id, answers) : [];
          
         res.status(200).send(scores);
     }
@@ -295,7 +295,7 @@ app.get('/forms/:id/scores/excel', async (req, res) => {
 
     try {
         var answers = await getResponses(forms, id);
-        const scores = evaluate(id, answers);
+        const scores = answers[0] ? evaluate(id, answers) : [];
 
         var wb = new Workbook();
         var ws = wb.addWorksheet('Wyniki');
@@ -326,14 +326,16 @@ app.get('/forms/:id/scores/excel', async (req, res) => {
         ws.cell(1, db.data.forms[id].questions.length + 2)
             .string('Suma').style(headerStyle);
         
-        for(let i = 0; i < scores.length; i++) {
-            ws.cell(i + 2, 1).string(scores[i].respondentEmail || '')
-                .style(emailStyle);
-            for(let j = 0; j < scores[i].evaluation.length; j++) {
-                ws.cell(i + 2, j + 2).number(scores[i].evaluation[j]);
+        if(scores[0]) {
+            for(let i = 0; i < scores.length; i++) {
+                ws.cell(i + 2, 1).string(scores[i].respondentEmail || '')
+                    .style(emailStyle);
+                for(let j = 0; j < scores[i].evaluation.length; j++) {
+                    ws.cell(i + 2, j + 2).number(scores[i].evaluation[j]);
+                }
+                ws.cell(i + 2, scores[i].evaluation.length + 2)
+                    .number(scores[i].totalPoints);
             }
-            ws.cell(i + 2, scores[i].evaluation.length + 2)
-                .number(scores[i].totalPoints);
         }
 
         await wb.write(`${__dirname}/excels/${id}.xlsx`);
