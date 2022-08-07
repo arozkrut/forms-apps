@@ -1,7 +1,7 @@
 .vagrant
+.vscode
 
 forms-app/node_modules
-forms-app/src/credentials
 forms-app/.vscode
 forms-app/src/tex2png/.idea
 forms-app/src/database/db.json
