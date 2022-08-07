@@ -1,0 +1,75 @@
+{
+  "title": "Form Title",
+  "description": "Form description can be looooooong",
+  "startDate": "2022-09-10T15:00:00Z",
+  "endDate": "2022-09-10T17:00:00Z",
+  "shuffleAnswers": true,
+  "questions": 
+  [
+      {
+          "type": "checkBox", 
+          "text": "Some question", 
+          "tex": false, 
+          "answers": [
+              {"text": "correct answer", "correct": true, "tex": false},
+              {"text": "other correct answer", "correct": true, "tex": false},
+              {"text": "wrong answer", "correct": false, "tex": false},
+              {"text": "another correct one", "correct": true, "tex": false},
+              {"text": "incorrect", "correct": false, "tex": false}
+          ],
+          "pointsArray": [0, 1, 2, 3]
+      },
+      {
+          "type": "list", 
+          "text": "Some question", 
+          "tex": false, 
+          "answers": [
+              {"text": "correct answer", "correct": true, "tex": false},
+              {"text": "not correct", "correct": false, "tex": false},
+              {"text": "wrong answer", "correct": false, "tex": false},
+              {"text": "nope", "correct": false, "tex": false},
+              {"text": "incorrect", "correct": false, "tex": false}
+          ],
+          "points": 5 
+      },
+      {
+          "type": "list", 
+          "text": "Only tex is correct $x = 2^2$", 
+          "tex": true, 
+          "answers": [
+              {"text": "correct answer", "correct": false, "tex": false},
+              {"text": "other correct answer", "correct": true, "tex": false},
+              {"text": "wrong answer", "correct": false, "tex": false},
+              {"text": "another correct one", "correct": false, "tex": false},
+              {"text": "incorrect", "correct": false, "tex": false}
+          ],
+          "points": 5 
+      },
+      {
+          "type": "list", 
+          "text": "Some question $x = 5^2$", 
+          "tex": true, 
+          "answers": [
+              {"text": "correct answer $ x_1 + x_2 = x_3 $", "correct": true, "tex": true},
+              {"text": "incorrect answer $ x^3 $", "correct": false, "tex": true}
+          ],
+          "points": 2
+      },
+      {
+          "type": "grid",
+          "text": "Choose true or false",
+          "tex": false,
+          "answers": [
+              {"text": "Is sky blue?", "correct": true, "tex":false},
+              {"text": "Dogs are animals?", "correct": true, "tex":false},
+              {"text": "Trees grow upwards", "correct": false, "tex":false}
+          ],
+          "pointsArray": [0, 1, 2, 3]
+      },
+      {
+          "type": "text",
+          "text": "Text question..........  ",
+          "tex": false
+      }
+  ]
+}

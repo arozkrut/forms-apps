@@ -61,7 +61,6 @@ function validation(json){
             "required": [ "title", "questions" ],
             "properties": {
                 "title": {"type": "string"},
-                "check": {"type": "boolean"},
                 "description": {"type": "string"},
                 "startDate": {"type": "string", "format": "date-time"},
                 "endDate": {"type": "string", "format": "date-time"},
