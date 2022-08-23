@@ -1,3 +1,52 @@
 \chapter{Wprowadzenie}%Wstęp - opis problemu, motywacja
 
-Wprowadzenie
+Wraz z rozpoczęciem pandemii problem zdalnego sprawdzania wiedzy i umiejętności
+ zrobił się popularny. Miejsca, w których było to szczególnie uciążliwe to m.~in. szkoły, 
+uczelnie, czy procesy rekrutacyjne w różnych firmach. Dobre narzędzie do przeprowadzania zdalnych
+testów powinno spełniać pewne wymagania, takie jak:
+\begin{itemize}
+  \item przejrzystość formularzy,
+  \item łatwość tworzenia nowych testów,
+  \item możliwość skutecznego weryfikowania tożsamości osoby piszącej test.
+\end{itemize}
+\\Dodatkowo dobrze jest, gdy takie narzędzie posiada również takie funkcje jak:
+\begin{itemize}
+  \item automatyczne sprawdzanie pytań zamkniętych,
+  \item kontrolowanie czasu potrzebnego poszczególnym osobom na zakończenie testu,
+  \item możliwość losowych zmian kolejności pytań,
+  \item możliwość zapisywania odpowiedzi w popularnym formacie.
+\end{itemize}
+\\Ponadto niektórzy egzaminujący cenią sobie możliwość wstawiania symboli matematycznych, 
+wykresów czy zdjęć w ramach pytań.
+
+\\ We wrześniu 2021 roku Agnieszka Pawicka obroniła pracę inżynierską o tytule \ap, 
+ w której zaproponowała system umożliwiający generowanie testów Google Form z pliku 
+ w formacie JSON. Projekt umożliwiał także generowanie pytań zawierająch wstawki w \LaTeX, 
+ które były automatycznie kompilowane i wstawiane do formularza.
+ \\ Celem tej pracy jest usprawnienie działania wymienionego wyżej narzędzia.
+ \section{Wprowadzone usprawnienia}
+W pracy został zaimplementowany szereg modyfikacji, które ułatwiają korzystanie z narzędzia
+zarówno przy tworzeniu formularzy, zarządzaniu nimi, jak i ich późniejszym sprawdzaniu. Te usprawnienia to:
+\begin{itemize}
+  \item łatwiejszy sposób instalacji narzędzia,
+  \item zmiana interfejsu użytkownika na bardziej intuicyjny,
+  \item zmiana sposobu wgrywania zakodowanego formularza,
+  \item możliwość edycji pliku JSON z zakodowanym formularzem już po wgraniu go,
+  \item możliwość zobaczenia odpowiedzi oraz wyników w formacie JSON,
+  \item możliwość pobrania danych o przesłanych odpowiedziach 
+   i wynikach sprawdzania automatycznego w formacie EXCEL,
+  \item utworzone formularze są teraz przechowywane na Dysku Google użytkownika 
+  - nie jak w poprzedniej wersji na wspólnym dysku dla wszystkich użytkowników,
+  \item szereg nowych opcji związanych z parametrami formularza tj.:
+  \begin{itemize}
+    \item możliwość zmiany kolejności odpowiedzi wewnątrz pytań zamknietych,
+    \item możliwość dodania  opisu testu,
+    \item odpowiedzi do pytań mogą być teraz w formie symboli  matematycznych (\LaTeX),
+    \item możliwe jest dodanie oceniania innego niż zerojedynkowe dla pytań
+     wielokrotnego wyboru.
+  \end{itemize}  
+\end{itemize}
+
+\\Wszystkie wymienione zmiany wraz z użytymi narzędziami, instrukcją użytkownika oraz opisem
+środowsk i napotkanych problemów są opisane w dalszych rozdziałach niniejszej pracy. 
+

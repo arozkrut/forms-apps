@@ -5,3 +5,7 @@ forms-app/node_modules
 forms-app/.vscode
 forms-app/src/tex2png/.idea
 forms-app/src/database/db.json
+thesis/*.aux
+thesis/*.log
+thesis/*.out
+thesis/*.toc
