@@ -27,6 +27,7 @@ function FormCard(props: {
   ) => void,
   handleDelete: (id: string) => Promise<void>,
 }): ReactElement {
+  const SERVER_BASE_URL = 'http://localhost:9090';
   const { form, newEditForm, handleDelete } = props;
   const [expandCode, setExpandCode] = useState<boolean>(false);
   const [code, setCode] = useState<string>('');
@@ -57,7 +58,7 @@ function FormCard(props: {
     setLoading(true);
     setShowDialog(true);
     const client = axios.create({
-      baseURL: 'http://localhost:9090',
+      baseURL: SERVER_BASE_URL,
     });
 
     client.get(`/forms/${form.id}/${url}`).then((res) => {
@@ -159,7 +160,7 @@ function FormCard(props: {
             color="secondary"
             onClick={
               () => window.open(
-                `http://localhost:9090/forms/${form.id}/scores/excel`,
+                `${SERVER_BASE_URL}/forms/${form.id}/scores/excel`,
                 '_blank',
                 'noopener,noreferrer',
               )

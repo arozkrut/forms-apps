@@ -1,3 +1,26 @@
+// This application was created using Create React App.
+// Create React App is licensed under MIT License
+
+// Copyright (c) 2013-present, Facebook, Inc.
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 import {
   Alert,
   Button, List, ListItem, ListSubheader, Stack,
@@ -19,6 +42,7 @@ import AddDialog from './components/AddDialog';
 import EditDialog from './components/EditDialog';
 
 function App(): ReactElement {
+  const SERVER_BASE_URL = 'http://localhost:9090';
   const [formTemplates, setFormTemplates] = useState<FormTemplate[]>([]);
   const [openAlert, setOpenAlert] = useState<boolean>(false);
   const [alertText, setAlertText] = useState<string>('');
@@ -32,7 +56,7 @@ function App(): ReactElement {
   useEffect(() => {
     setLoading(true);
     const client = axios.create({
-      baseURL: 'http://localhost:9090',
+      baseURL: SERVER_BASE_URL,
     });
     client.get('/forms').then((res) => {
       setFormTemplates(res.data);
@@ -45,7 +69,7 @@ function App(): ReactElement {
     endDate: Date | null,
   ): Promise<void> => {
     const client = axios.create({
-      baseURL: 'http://localhost:9090',
+      baseURL: SERVER_BASE_URL,
     });
 
     setLoading(true);
@@ -84,7 +108,7 @@ function App(): ReactElement {
     endDate: Date | null,
   ): Promise<void> => {
     const client = axios.create({
-      baseURL: 'http://localhost:9090',
+      baseURL: SERVER_BASE_URL,
     });
 
     setLoading(true);
@@ -119,7 +143,7 @@ function App(): ReactElement {
 
   const handleSave = async (text: string): Promise<void> => {
     const client = axios.create({
-      baseURL: 'http://localhost:9090',
+      baseURL: SERVER_BASE_URL,
     });
 
     setLoading(true);
@@ -149,7 +173,7 @@ function App(): ReactElement {
 
   const handleDelete = async (id: string): Promise<void> => {
     const client = axios.create({
-      baseURL: 'http://localhost:9090',
+      baseURL: SERVER_BASE_URL,
     });
 
     setLoading(true);
