@@ -1,0 +1,99 @@
+\chapter{Środowisko}
+Praca jest rozszerzeniem innego projektu, wobec tego część użytych bibliotek zostało opisanych 
+w rozdziale ,,Środowisko'' pracy \ap. W niniejszym rozdziale skupię się więc na nowo dodanych
+elementach środowiska. W celu zapoznania się z całością polecam lekturę wymienionej 
+pracy.
+\\ Kod aplikacji można podzielić na trzy główne części:
+\begin{enumerate}
+  \item interfejs użytkownika,
+  \item serwer komunikujący się z zewnętrznymi API oraz bazą danych,
+  \item kod służący do instalacji zależności i uruchamiania aplikacji na maszynie wirtualnej 
+  - korzystający z technologii Vagrant i Ansible.
+\end{enumerate}
+Dodatkowo aplikacja korzysta z Google Forms API oraz Imgur API.
+
+\section{Interfejs użytkownika}
+
+\subsection{TypeScript}
+Aplikacja została napisana w języku TypeScript, który jest nadzbiorem języka JavaScript. 
+Aplikacja korzysta z bibliotek: 
+types/node, typescript.
+
+\subsection{React}
+Technologia służąca do tworzenia interfejsów
+graficznych aplikacji internetowych. Aplikacja korzysta z bibliotek:
+emotion/react, emotion/styled, types/react, types/react-dom, 
+react, react-dom, react-scripts.
+
+\subsection{Material UI}
+Biblioteka, która udostępnia wiele gotowych komponentów, których można użyć w
+aplikacjach korzystających z Reacta. 
+
+\subsection{axios}
+Biblioteka służąca do wysyłania zapytań http i pobierania danych z serwera.
+
+\subsection{date-fns}
+Biblioteka pomagająca zarządzać datami. Udostępnia wiele użytecznych funkcji.
+
+\subsection{react-code-blocks}
+Biblioteka z gotowymi komponentami służącymi do wyświetlania bloków kodu.
+
+\section{Serwer}
+
+\subsection{Node.js}
+Serwer został napisany w środowisku Node.js, które służy do tworzenia aplikacji
+serwerowych w języku JavaScript.
+
+\subsection{Google}
+Aplikacja używa bibliotek google-cloud/local-auth oraz googleapis/forms
+odpowiednio do autoryzacji projektu oraz użytkownika w serwerach Google 
+oraz do wysyłania zapytań do Google Forms API, które jest opisane w dalszej sekcji.
+
+\subsection{excel4node}
+Biblioteka służąca do tworzenia plików Excel.
+
+\subsection{lowdb}
+Mała, lokalna baza danych przechowująca dane w plikach JSON. Za jej pomocą
+przechowywane są zakodowane formularze.
+
+\section{Vagrant i Ansible}
+Vagrant to narzędzie służące do tworzenia wirtualnych środowisk programistycznych
+z użyciem na przykład VirtualBox, ale współdziała też z wieloma innymi oprogramowaniami.
+Ansible to narzędzie służące do automatyzacji
+wdrażania, konfiguracji i zarządzania. Z pomocą tych dwóch technologi zostały
+napisane skrypty, które same skonfigurują maszynę wirtualną i następnie uruchomią
+na niej wszystkie aplikacje potrzebne do działania narzędzia. 
+
+\section{Google Forms API oraz Imgur API}
+
+\subsection*{Google Forms API}
+Google Forms API to API, które umożliwia zarządzania Formularzami Google na dysku
+użytkownika. W czasie pisania tej pracy jest to wciąż bardzo nowe narzędzie, ponieważ
+jego pierwsza oficjalna wersja została opublikowana w 2022 roku. API pozwala m.in. zarządzać
+pytaniami i odpowiedziami, zmieniać ustawienia formularza i włączać automatyczne ocenianie.
+Jest ono wciąż dynamicznie rozwijane.
+
+\subsection*{Imgur API}
+Imgur API pozwala zarządzać plikami użytkownika na platformie Imgur, w tym dodawać je jako
+zalogowany lub niezalogowany użytkownik. Obrazy z pytaniami, które zostają utworzone, jeśli
+pytanie zawiera wstawki w języku \LaTeX, zostają wgrane na serwery Imgur, żeby serwery Google
+mogły je pobrać używając zewnętrznego URL podczas tworzenia formularza.
+
+\section{Python}
+Narzędzia korzysta ze skryptu w języku Python, aby stworzyć obrazy ze wstawkami w języku \LaTeX.
+Jest on dokładnie opisany we wspomnianej wcześniej pracy. Zostało dodane do niego wgrywanie 
+wygenerowanych obrazków na serwery Imgur za pomocą biblioteki imgurpython.
+Wszystkie biblioteki z jakich korzysta skrypt to: imgurpython, tex2pix, pdf2image oraz
+opencv-python.
+
+\section{Poppler}
+Poppler to biblioteka służąca do renderowania plików PDF. Wspomniany powyżej skrypt
+używa pakietu poppler-utils, do tworzenia plików PDF. Ten pakiet jest powszechnie
+używany na systemach operacyjnych opierających się na Debianie.
+
+\section{LaTeX}
+Jak już wiele razy zostało wspomniane w tej pracy, narzędzie pozwala generować formularze ze 
+wstawkami
+w języku \LaTeX, zatem aby narzędzie działało poprawnie \LaTeX musi być zainstalowany 
+na maszynie, na którym narzędzie ma zostać uruchomione. Skrypt Ansible dodatkowo instaluje
+polski pakiet językowy.

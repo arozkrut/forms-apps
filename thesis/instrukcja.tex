@@ -14,36 +14,54 @@ Dokładne instrukcje można znaleźć w poradnikach w dokumentacji Google,
 a w tej pracy spróbuję krótko opisać ten proces: 
 
 \begin{itemize}
-  \item zaloguj się do konsoli Google Cloud,
-  \item znajdź przycisk ,,Wybierz Projekt'',
-  \item w nowym oknie naciśnij przycisk ,,Nowy Projekt'',
-  \item wpisz nazwę projektu oraz lokalizację, a następnie naciśnij ,,Utwórz'',
-  \item w menu po lewej stronie wybierz ,,Wyświetl Wszytskie Usługi'',
-  \item w sekcji ,,Zarządzanie'' wybierz ,,Interfejsy API i usługi'',
-  \item wybierz swój projekt,
-  \item kliknij ,,Interfejsy API i usługi'',
-  \item wyszukaj ,,Google Forms API'',
-  \item w szczegółach Google Forms API kliknij ,,Włącz'',
-  \item w menu po lewej stronie wybierz ,,Dane logowania'',
-  \item kliknij ,,Create Credentials'', a potem ,,Klucz interfejsu API'',
-  \item zapisz klucz w pliku i zachowaj na później,
-  \item ponownie kliknij ,,Create Credentials'', a potem 
-  ,,Identyfikator Klienta OAuth'',
-  \item kliknij ,,Skonfiguruj Ekran Zgody'',
-  \item jako typ użytkownika wybierz ,,Zewnętrzny'' i kliknij ,,Utwórz'',
-  \item wpisz nazwę aplikacji, adresy e-mail i kliknij ,,Zapisz i kontynuuj'',
-  \item kliknij ,,Dodaj lub usuń zakres'',
-  \item w ,,Filtruj'' wpisz ,,Google Forms API'',
-  \item zaznacz zakresy ,,forms.body'' i ,,forms.responses.readonly'',
-  \item kliknij ,,Zaktualizuj'', następnie ,,Zapisz i kontynuuj'',
-  \item dodaj swój adres konta Google do użytkowników testowych, kliknij
-  ,,Zapisz i kontynuuj'' i na końcu ,,Powrót do panelu'',
-  \item wybierz ponownie ,,Dane Logowania'', ,,Create Credentials''
-  i ,,Identyfikator Klienta OAuth''
-  \item jako typ aplikacji wybierz ,,Aplikacja internetowa'', dodaj URI 
-  \\ \texttt{http://localhost:3000/oauth2callback} do sekcji ,,Autoryzowane 
-  identyfikatory URI przekierowania'' i kliknij ,,Utwórz'',
-  \item wybierz ,,Pobierz JSON''.
+  \item załóż nowy projekt
+    \begin{itemize}
+      \item zaloguj się do konsoli Google Cloud,
+      \item znajdź przycisk ,,Wybierz Projekt'',
+      \item w nowym oknie naciśnij przycisk ,,Nowy Projekt'',
+      \item wpisz nazwę projektu oraz lokalizację, a następnie naciśnij ,,Utwórz'',
+    \end{itemize}
+  \item  Dodaj Google Forms API do projektu
+    \begin{itemize}
+      \item w menu po lewej stronie wybierz ,,Wyświetl Wszystkie Usługi'',
+      \item w sekcji ,,Zarządzanie'' wybierz ,,Interfejsy API i usługi'',
+      \item wybierz swój projekt,
+      \item kliknij ,,Interfejsy API i usługi'',
+      \item wyszukaj ,,Google Forms API'',
+      \item w szczegółach Google Forms API kliknij ,,Włącz'',
+    \end{itemize}
+  \item wygenereuj Klucz interfejsu API
+    \begin{itemize}
+      \item przejdź do strony projektu
+      \item w menu po lewej stronie wybierz ,,Dane logowania'',
+      \item kliknij ,,Create Credentials'', a potem ,,Klucz interfejsu API'',
+      \item zapisz klucz w pliku i zachowaj na później,
+    \end{itemize}
+  \item skonfiguruj ekran zgody
+    \begin{itemize}
+      \item przejdź do strony projektu
+      \item ponownie kliknij ,,Create Credentials'', a potem 
+            ,,Identyfikator Klienta OAuth'',
+      \item kliknij ,,Skonfiguruj Ekran Zgody'',
+      \item jako typ użytkownika wybierz ,,Zewnętrzny'' i kliknij ,,Utwórz'',
+      \item wpisz nazwę aplikacji, adresy e-mail i kliknij ,,Zapisz i kontynuuj'',
+      \item kliknij ,,Dodaj lub usuń zakres'',
+      \item w ,,Filtruj'' wpisz ,,Google Forms API'',
+      \item zaznacz zakresy ,,forms.body'' i ,,forms.responses.readonly'',
+      \item kliknij ,,Zaktualizuj'', następnie ,,Zapisz i kontynuuj'',
+      \item dodaj swój adres konta Google do użytkowników testowych, kliknij
+      ,,Zapisz i kontynuuj'' i na końcu ,,Powrót do panelu'',
+    \end{itemize}
+  \item wygeneruj identyfikator klienta OAuth
+    \begin{itemize}
+      \item przejdź do strony projektu
+      \item wybierz ponownie ,,Dane Logowania'', ,,Create Credentials''
+            i ,,Identyfikator Klienta OAuth''
+      \item jako typ aplikacji wybierz ,,Aplikacja internetowa'', dodaj URI 
+            \\ \texttt{http://localhost:3000/oauth2callback} do sekcji ,,Autoryzowane 
+            identyfikatory URI przekierowania'' i kliknij ,,Utwórz'',
+      \item wybierz ,,Pobierz JSON''.
+    \end{itemize}
 \end{itemize}
 
 \subsection{Imgur API}
@@ -70,13 +88,21 @@ stwórz pliki:
   \begin{verbatim}
     key=<uzyskany klucz>
   \end{verbatim}
-  \item \texttt{credentials.json}: wklej tu zawartość pobranego pliku JSON,
+  Klucz służy do identyfikacji aplikacji podczas wysyłania zapytań do Google Forms API. 
+  Proces generacji klucza interfejsu API został opisany wczesniej w tym rozdziale.
+  \item \texttt{credentials.json}: wklej tu zawartość pobranego pliku JSON.
+  Plik zawiera dane uwierzytelniające, które również są używane przy wysyłaniu
+  zapytań do Google Forms API. 
+  Proces generacji pliku JSON został opisany wcześniej w tym rozdziale.
   \item \texttt{imgur\_credentials.txt}: wklej tu Client ID i Client secret,
-  tak żeby plik był postaci
+  tak żeby plik był postaci:
   \begin{verbatim}
     ClientID: <Client ID>
     ClientSecret: <Client secret>
   \end{verbatim}
+  Identyfikator oraz sekret służą do identyfikacji aplikacji podczas wysyłania zapytań
+  do Imgur API. Proces generacji identyfikatora oraz sekretu został opisany wcześniej
+  w tym rozdziale.
 \end{itemize}
 
 \subsection{Instalacja z Vagrant}
@@ -84,7 +110,9 @@ Jeśli masz już zainstalowany Vagrant wystarczy, że w głównym katalogu proje
 (tym z \texttt{Vagrantfile}) użyjesz polecenia \texttt{vagrant up}. Skrypt
 Ansible zainstaluje wszystkie potrzebne zależności i uruchomi wszystkie
 aplikacje. Ważne jest, że projekt potrzebuje portów 3000, 9090 i 9091.
-Jeśli któryś z nich jest już zajęty narzędzie nie uruchomi się. Instalacja może
+Jeśli któryś z nich jest już zajęty narzędzie nie uruchomi się. Porty 9090 i 9091
+można zmienić na inne, ale portu 3000 niestety nie. Opis jak to zrobić można znaleźć
+w sekcji ,,Porty''. Instalacja może
 chwilę potrwać. Po jej zakończeniu wyświetli się wiadomość z linkiem prowadzącym
 do strony uwierzytelniania Google, gdzie trzeba wybrać konto Google, na którym
 będą przechowywane formularze oraz wyrazić zgodę na nadanie aplikacji dostępu do
@@ -98,13 +126,59 @@ sam zainstalować wszystkie zależności: Python 3, \LaTeX{}, poppler-utils, bib
 do języka Python opisane w poprzednim rozdziale, nodejs, npm. Następnie w katalogach
 \texttt{forms-app} oraz \texttt{forms-app-ui} należy wydać polecenie \texttt{npm i}.
 Teraz należy włączyć serwer NodeJS poleceniem \texttt{node src/server.js} 
-(koniecznie w katalogu \texttt{forms-app}). W przeglądarce powinna uruchomić się
+(koniecznie w katalogu \texttt{forms-app}). Serwer korzysta z portów 9090 i 3000, 
+więc przed uruchomieniem należy upewnić się, że są one niezajęte. Port 9090 można
+zmienić na inny, ale 3000 już nie. Opis jak to zrobić można znaleźć w sekcji ,,Porty''.
+Po uruchomieniu serwera w przeglądarce powinna otworzyć się
 strona uwierzytelniania Google, gdzie trzeba wybrać konto Google, na którym
 będą przechowywane formularze oraz wyrazić zgodę na nadanie aplikacji dostępu do
 formularzy na tym koncie Google. Po tym w katalogu \texttt{src/forms-app-ui}
 należy włączyć serwer interfejsu użytkownika poleceniem \texttt{npm start}, który
 uruchomi się pod adresem \href{http://localhost:9091}{http://localhost:9091}.
-Po odwiedzeniu tej strony w przeglądarce można zacząć pracować z narzędziem.
+Port 9091 na którym działa aplikacja można również zmienić na inny.
+Po odwiedzeniu \href{http://localhost:9091}{http://localhost:9091} w przeglądarce
+można zacząć pracować z narzędziem.
+
+\section{Porty}
+Narzędzie korzysta z trzech portów: 9090, 9091 oraz 3000. Dwa pierwsze można
+zmienić edytując kilka linijek w kodzie, ale portu 3000 niestety nie da się zmienić
+na inny. Jest on wykorzystywany przez bibliotekę, służącą do autoryzacji aplikacji
+i użytkownika w serwerach Google i ta biblioteka nie udostępnia sposobu 
+na zmianę tego portu. Niezależnie, czy narzędzie jest instalowane używając Vagranta,
+czy nie pierwsze kroki, żeby zmienić porty 9090 i 9091 są takie same:
+\begin{itemize}
+  \item zmiana portu 9090: 
+    \begin{itemize}
+      \item w pliku \texttt{forms-app/src/server.js} znajdź zmienną
+        \texttt{port} i zmień jej wartość,
+      \item w plikach
+        \begin{itemize}
+          \item \texttt{forms-app-ui/src/App.tsx}
+          \item \texttt{forms-app-ui/src/components/FormCard.tsx}
+        \end{itemize}
+        znajdź zmienną \texttt{SERVER\_BASE\_URL} i zmień port na inny,
+    \end{itemize}
+  \item zmiana portu 9091:
+    \begin{itemize}
+      \item w pliku \texttt{forms-app-ui/package.json} w \texttt{scripts}, 
+            \texttt{start} zmień \texttt{PORT=9091} na inny port.
+    \end{itemize}
+\end{itemize}
+
+Jeśli narzędzie jest instalowane z użyciem Vagranta w pliku \texttt{Vagrantfile}
+należy dodać nowe porty. Pod linijkami:
+\begin{verbatim}
+  config.vm.network :forwarded_port, guest: 80, host: 8001
+  config.vm.network :forwarded_port, guest: 9090, host: 9090
+  config.vm.network :forwarded_port, guest: 3000, host: 3000
+  config.vm.network :forwarded_port, guest: 9091, host: 9091
+\end{verbatim}
+dla każdego nowego portu należy dodać linijkę:
+\begin{verbatim}
+  config.vm.network :forwarded_port, guest: <NOWY_PORT>, host: <NOWY_PORT>
+\end{verbatim}
+Po wykonaniu tych kroków należy zresetować obie aplikacje lub maszynę wirtualną
+poleceniem \texttt{vagrant reload}.
 
 \section{Praca z narzędziem}
 
@@ -187,7 +261,7 @@ wymagane. Poniżej znajduje się szczegółowy opis pól i wartości:
     \item{points} -- wartość numeryczna, odpowiada liczbie punktów przyznawanej za
     poprawą odpowiedź na pytanie (tylko dla pytań typu list)
     --- \textbf{pole opcjonalne},
-    \item{pointsArray} -- tablica z wartościami numeryczymi, odpowiada liczbie punktów
+    \item{pointsArray} -- tablica z wartościami numerycznymi, odpowiada liczbie punktów
     przyznawanej za poprawne odpowiedzi na pytanie (tylko dla pytań typu checkBox i grid),
     przykładowo wartość $ [0, 1, 3] $ wskazuje, że jeśli nie zostanie wybrana żadna dobra
     odpowiedź, zostanie przyznane 0 punktów, jeśli zostanie udzielona jedna dobra odpowiedź,
@@ -219,7 +293,7 @@ oceniania zależy od typu pytania:
 Po uruchomieniu użytkownik widzi stronę w przeglądarce, jak na zdjęciu poniżej:
 \begin{figure}[H]
  \centering
-  \includegraphics[scale=0.30]{strona.png}
+  \includegraphics[scale=0.26]{strona.png}
   \caption{Interfejs aplikacji}
   \label{fig:1}
 \end{figure}
@@ -229,7 +303,7 @@ formularza i ewentualnie czas rozpoczęcia i zakończenia testu. Po kliknięciu
 się na liście na głównej stronie aplikacji. Przycisk ,,Dodaj istniejący'' otworzy
 dialog, gdzie możemy podać identyfikator istniejącego już formularza, który chcemy
 dodać do listy formularzy zarządzanych przez aplikację. Musimy również podać jego
-kodowanie. Po kliknięciu ,,Dodaj'' formularz zostanie zedytowany i pojawi się na 
+kodowanie. Po kliknięciu ,,Dodaj'' formularz zostanie edytowany i pojawi się na 
 liście formularzy. Na liście formularzy każdy wpis odpowiada jednemu formularzowi
 na dysku Google użytkownika, jednak nie wszystkie formularze na dysku się tu pojawią,
 jedynie te stworzone przez aplikację lub dodane używając przycisku ,,Dodaj istniejący''.
@@ -238,7 +312,7 @@ W każdym wpisie możemy znaleźć przyciski:
   \item ,,Otwórz'': otwiera formularz na stronie Google w nowej karcie,
   \item ,,Edytuj w Google'': otwiera stronę edycji formularza na stronie Google
     w nowej karcie,
-  \item ,,Edytuj'': otwiera dialog, gdzie można edytowac kodowanie formularza,
+  \item ,,Edytuj'': otwiera dialog, gdzie można edytować kodowanie formularza,
   \item ,,Usuń'': usuwa formularz z listy formularzy zarządzanych przez aplikację
     i usuwa całą jego zawartość, jednak pusty formularz tylko z tytułem pozostanie 
     na dysku Google użytkownika,
@@ -252,7 +326,7 @@ W każdym wpisie możemy znaleźć przyciski:
 
 \subsection{Przeprowadzanie egzaminów}
 Jeśli narzędzie ma być użyte do przeprowadzenia egzaminu na początku należy stworzyć
-z jego pomocą pusty formularz tylko z tytułem, ewentulanie krótką informacją o czasie
+z jego pomocą pusty formularz tylko z tytułem, ewentualnie krótką informacją o czasie
 startu. Przed rozpoczęciem należy ręcznie włączyć w ustawieniach formularza na stronie
 Google zbieranie adresów email i ewentualnie tasowanie pytań. Następnie w momencie
 rozpoczęcia egzaminu należy go zaktualizować dodając do niego pytania.
