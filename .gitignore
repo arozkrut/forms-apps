@@ -9,3 +9,6 @@ thesis/*.aux
 thesis/*.log
 thesis/*.out
 thesis/*.toc
+thesis/*.fls
+thesis/*.gz
+thesis/*.fdb_latexmk

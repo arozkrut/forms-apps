@@ -1,1 +1,84 @@
 \chapter{Opis techniczny}
+Głównym tematem tego rozdziału jest opis techniczny wszystkich aplikacji i skryptów, które 
+tworzą całe narzędzie. Została tu opisana struktura kodu i schemat komunikacji między 
+aplikacjami.
+Kod projektu można podzielić na cztery główne części:
+\begin{enumerate}
+  \item interfejs użytkownika,
+  \item serwer komunikujący się z zewnętrznymi API oraz bazą danych,
+  \item kod służący do instalacji zależności i uruchamiania aplikacji na maszynie wirtualnej 
+  - korzystający z technologii Vagrant i Ansible,
+  \item skrypt w języku Python konwertujący wstawki w języku \LaTeX do obrazów.
+\end{enumerate}
+
+\section{Serwer}
+Kod serwera i inne pliki potrzebne do jego działania znajdują się w katalogu \texttt{forms-app}.
+
+\subsection{Kod źródłowy}
+Kod źródłowy serwera znajduje się w katalogu \texttt{src}. Serwer udostępnia kilka adresów,
+pod którymi można się z nim komunikować używając protokołu http:
+\begin{itemize}
+  \item \texttt{GET /forms}: zwraca wszystkie formularze, które znajdują się w lokalnej
+    bazie danych,
+  \item \texttt{GET /forms/:id}: zwraca informacje o formularzu o podanym identyfikatorze,
+  \item \texttt{POST /forms}: pod ten adres można wysłać formularz w kodowaniu JSON, żeby
+    stworzyć nowy formularz Google,
+  \item \texttt{PUT /forms/:id}: pod ten adres można wysłać zakodowany formularz w formacie
+    JSON, żeby edytować formularz o podanym identyfikatorze, edytowany jest formularz
+    w lokalnej bazie danych oraz formularz Google,
+  \item \texttt{GET /forms/:id/answers}: zwraca wszystkie przesłane odpowiedzi,
+  \item \texttt{GET /forms/:id/scores}: zwraca wszystkie ocenione przesłane odpowiedzi,
+  \item \texttt{GET /forms/:id/scores}: przesyła plik EXCEL z ocenionymi przesłanymi 
+    odpowiedziami,
+  \item \texttt{DELETE /forms/:id}: usuwa formularz o podanym identyfikatorze z lokalnej bazy
+    danych oraz usuwa wszystkie pytania z formularza Google, ale nie jego samego
+\end{itemize}
+Kod z konfiguracją tych adresów można znaleźć w pliku \texttt{src/server.js}. Aplikacja
+z interfejsem użytkownika używa tych adresów, żeby komunikować się z serwerem.
+Plik \texttt{formsFunctions.js} zawiera funkcje pomocnicze, które przykładowo tworzą
+zapytania wysyłane do Google Forms API lub oceniają zamknięte pytania w przesłanych
+odpowiedziach i konwertują je do formatów JSON lub EXCEL. Plik \texttt{jsonValidator.js}
+zawiera walidator zakodowanych formularzy w formacie JSON, który jest dokładnie opisany
+w pracy \ap.
+
+\subsection{Google Forms API}
+W poprzedniej wersji projekt korzystał z Google Apps Script. Część kodu oraz utworzone
+formularze Google były przechowywane na jednym konkretnym koncie Google, którego ewentualna
+zmiana byłaby bardzo skomplikowana. Było to niewygodne w użyciu, może niezbyt bezpieczne
+oraz utrudniało rozwój narzędzia. Dlatego zdecydowałam się przepisać część komunikującą się
+serwerami Google na kod wysyłający zapytania do Google Forms API. Google Forms API to niedawno
+powstałe API, które w łatwy sposób pozwala zarządzać formularzami Google na dowolnym koncie
+Google i jest wciąż dynamiczne rozwijane, więc w przyszłości można liczyć na dodanie do niego
+wielu funkcjonalności, które pozwoliłoby na dalszy rozwój narzędzia, które jest tematem tej pracy.
+Żeby korzystać z Google Forms API wystarczy założyć projekt w konsoli Google Cloud, co jest w pełni
+darmowe dla każdej osoby posiadającej konto Google i jest dokładnie opisane w następnym rozdziale.
+Następnie użytkownik może pozwolić aplikacji zarządzać formularzami na swoim dysku Google bez obaw, 
+że ktokolwiek inny miałby do nich dostęp. Serwer wysyła do Google Forms API zapytania i dostaje
+przejrzyste odpowiedzi w formacie JSON. Na ten moment API pozwala zarządzać formularzami oraz
+przesłanymi do nich odpowiedziami, co pozwala na napisanie naszego własnego sposobu oceniania tych
+odpowiedzi. Google Forms API udostępnia automatyczne ocenianie, ale za każde pytanie można
+dostać tylko zero lub maksymalną liczbę punktów, co jest niewystarczające. Chcielibyśmy móc
+za każde pytanie przydzielić przykładowo połowę punktów, jeśli nie zostały zaznaczone wszystkie
+poprawne odpowiedzi. W tej pracy udało się to zrealizować.
+
+\subsection{Imgur API}
+% nowy template odpowiedzi
+
+\subsection{Lokalna baza danych}
+ 
+\subsection{Katalog assets}
+Wszystkie obrazki z tekstem ze wstawkami w języku \LaTeX  oraz wszystkie inne pliki, które
+powstają podczas ich tworzenia są generowane w katalogu \texttt{assets}, dlatego ważne jest, żeby
+go nie usuwać. Zawartość tego katalogu można usunąć oprócz pliku \texttt{.gitignore}, ponieważ
+wygenerowane obrazki są używane tylko podczas tworzenia lub edytowania formularza.
+
+\subsection{Katalog src/credentials}
+
+\subsection{Katalog src/excels}
+
+\subsection{ESLint}
+Do aplikacji serwera został dodany ESLint, który pomaga pisać przejrzysty kod i na bieżąco
+analizuje kod i sprawdza, czy nie zawiera on błędów. To zachowanie można dowolnie edytować używając 
+zasad udostępnionych przez to narzędzie. Zasady skonfigurowane dla tego projektu można znaleźć 
+w pliku \texttt{.eslintrc.json}. W celu dokładniejszego zrozumienia, jak działa to narzędzie 
+zachęcam do zapoznania się z dokumentacją.

@@ -3,12 +3,13 @@ Praca jest rozszerzeniem innego projektu, wobec tego część użytych bibliotek
 w rozdziale ,,Środowisko'' pracy \ap. W niniejszym rozdziale skupię się więc na nowo dodanych
 elementach środowiska. W celu zapoznania się z całością polecam lekturę wymienionej 
 pracy.
-\\ Kod aplikacji można podzielić na trzy główne części:
+\\ Kod projektu można podzielić na cztery główne części:
 \begin{enumerate}
   \item interfejs użytkownika,
   \item serwer komunikujący się z zewnętrznymi API oraz bazą danych,
   \item kod służący do instalacji zależności i uruchamiania aplikacji na maszynie wirtualnej 
-  - korzystający z technologii Vagrant i Ansible.
+  - korzystający z technologii Vagrant i Ansible
+  \item skrypt w języku Python konwertujący wstawki w języku \LaTeX do obrazów.
 \end{enumerate}
 Dodatkowo aplikacja korzysta z Google Forms API oraz Imgur API.
 
@@ -80,7 +81,7 @@ pytanie zawiera wstawki w języku \LaTeX, zostają wgrane na serwery Imgur, żeb
 mogły je pobrać używając zewnętrznego URL podczas tworzenia formularza.
 
 \section{Python}
-Narzędzia korzysta ze skryptu w języku Python, aby stworzyć obrazy ze wstawkami w języku \LaTeX.
+Narzędzie korzysta ze skryptu w języku Python, aby stworzyć obrazy ze wstawkami w języku \LaTeX.
 Jest on dokładnie opisany we wspomnianej wcześniej pracy. Zostało dodane do niego wgrywanie 
 wygenerowanych obrazków na serwery Imgur za pomocą biblioteki imgurpython.
 Wszystkie biblioteki z jakich korzysta skrypt to: imgurpython, tex2pix, pdf2image oraz
