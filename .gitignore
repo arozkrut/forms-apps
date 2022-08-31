@@ -5,6 +5,14 @@ forms-app/node_modules
 forms-app/.vscode
 forms-app/src/tex2png/.idea
 forms-app/src/database/db.json
+forms-app/src/tex2png/*.aux
+forms-app/src/tex2png/*.log
+forms-app/src/tex2png/*.out
+forms-app/src/tex2png/*.toc
+forms-app/src/tex2png/*.fls
+forms-app/src/tex2png/*.gz
+forms-app/src/tex2png/*.fdb_latexmk
+forms-app/src/tex2png/*.pdf
 thesis/*.aux
 thesis/*.log
 thesis/*.out
