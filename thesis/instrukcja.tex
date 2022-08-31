@@ -205,7 +205,6 @@ Poniżej znajduje się rozpisany schemat kodowania:
     "pointsArray": "array"
   }]
 }
-
 \end{lstlisting}
 \end{figure}
 Jest to opis tych wartości, które mogą być użyte --- nie wszystkie są jednak 
@@ -271,6 +270,11 @@ wymagane. Poniżej znajduje się szczegółowy opis pól i wartości:
   \end{itemize}
 \end{itemize}
 
+Bardzo ważne jest to, że tekst odpowiedzi i pytań ze wstawkami matematycznymi
+musi być postaci \texttt{"\$ 5 \textbackslash \textbackslash times 5 \$"}, jeśli
+chcemy uzyskać pytanie z tekstem $ 5 \times 5 $. Każde polecenie zaczynające się
+odwrotnym ukośnikiem musi zaczynać się dwoma ukośnikami.
+
 \subsection{Automatyczne ocenianie}
 Pytania typu list, checkBox i grid mogą zostać automatycznie ocenione i wyniki mogą zostać
 pobrane w formacie JSON lub pliku Excel. Jeśli chcemy, żeby odpowiedzi zostały ocenione
@@ -295,7 +299,7 @@ Po uruchomieniu użytkownik widzi stronę w przeglądarce, jak na zdjęciu poni�
  \centering
   \includegraphics[scale=0.26]{strona.png}
   \caption{Interfejs aplikacji}
-  \label{fig:1}
+  \label{fig:2}
 \end{figure}
 Przycisk ,,Stwórz nowy'' otworzy dialog, w którym należy wprowadzić kodowanie 
 formularza i ewentualnie czas rozpoczęcia i zakończenia testu. Po kliknięciu 

@@ -39,7 +39,9 @@ Plik \texttt{formsFunctions.js} zawiera funkcje pomocnicze, które przykładowo 
 zapytania wysyłane do Google Forms API lub oceniają zamknięte pytania w przesłanych
 odpowiedziach i konwertują je do formatów JSON lub EXCEL. Plik \texttt{jsonValidator.js}
 zawiera walidator zakodowanych formularzy w formacie JSON, który jest dokładnie opisany
-w pracy \ap.
+w pracy \ap. W katalogu \texttt{tex2png} znajduje się moduł, który służy do uruchamiania
+skryptu w języku Python, który tworzy obrazki ze wstawkami w języku \LaTeX i udostępnia
+je na serwisie Imgur.
 
 \subsection{Google Forms API}
 W poprzedniej wersji projekt korzystał z Google Apps Script. Część kodu oraz utworzone
@@ -49,7 +51,7 @@ oraz utrudniało rozwój narzędzia. Dlatego zdecydowałam się przepisać czę�
 serwerami Google na kod wysyłający zapytania do Google Forms API. Google Forms API to niedawno
 powstałe API, które w łatwy sposób pozwala zarządzać formularzami Google na dowolnym koncie
 Google i jest wciąż dynamiczne rozwijane, więc w przyszłości można liczyć na dodanie do niego
-wielu funkcjonalności, które pozwoliłoby na dalszy rozwój narzędzia, które jest tematem tej pracy.
+wielu funkcjonalności, które pozwoliłoby na dalszy rozwój narzędzia.
 Żeby korzystać z Google Forms API wystarczy założyć projekt w konsoli Google Cloud, co jest w pełni
 darmowe dla każdej osoby posiadającej konto Google i jest dokładnie opisane w następnym rozdziale.
 Następnie użytkownik może pozwolić aplikacji zarządzać formularzami na swoim dysku Google bez obaw, 
@@ -61,10 +63,73 @@ dostać tylko zero lub maksymalną liczbę punktów, co jest niewystarczające. 
 za każde pytanie przydzielić przykładowo połowę punktów, jeśli nie zostały zaznaczone wszystkie
 poprawne odpowiedzi. W tej pracy udało się to zrealizować.
 
-\subsection{Imgur API}
-% nowy template odpowiedzi
+\subsubsection{Uwierzytelnianie i autoryzacja}
+Proces uwierzytelniania i autoryzacji z Google przebiega w kilku krokach:
+\begin{enumerate}
+  \item uwierzytelnianie aplikacji: kiedy aplikacja się uruchomia, wysyła ona swoje
+    dane uwierzytelniające do Google z informacją, że chciałaby mieć dostęp do 
+    formularzy użytkowników Google,
+  \item ekran zgody: Google zwraca ekran zgody, w którym użytkownik musi wybrać swoje
+    konto Google i zgodzić się na to, że aplikacja będzie mogła zarządzać formularzami
+    na tym koncie. Jeśli użytkownik to zrobi, aplikacja wysyła zapytanie do Google
+    ze swoimi danymi uwierzytelniającymi w celu uzyskania tokena dostępu, którego
+    będzie teraz używać, żeby uzyskać dostęp do wszystkich potrzebnych zasobów,
+  \item przyznanie tokena dostępu: jeśli wszystko przejdzie pomyślnie, Google
+    odeśle aplikacji żądany token dostępu. Token zawiera informacje o tym, do których
+    zasobów aplikacja uzyskała dostęp, 
+  \item dostęp do zasobów: aplikacja może teraz wysyłać zapytania do Google, w których
+    może zarządzać odpowiednimi zasobami, w naszym przypadku formularzami i przesłanymi
+    do nich odpowiedziami,
+  \item odświeżanie tokena: tokeny mają czas ważności i jeśli on upłynie, aplikacja
+    musi poprosić o odświeżony token, aby móc dalej działać.
+\end{enumerate}
+Uwierzytelnianie i autoryzacja w serwisach Google są dokładnie opisane
+w ich dokumentacji.
 
 \subsection{Lokalna baza danych}
+Do narzędzia została dodana możliwość automatycznego ocenienia zamkniętych pytań w 
+przesłanych odpowiedziach. Google zapamiętuje przesłane odpowiedzi w postaci:
+\begin{figure}[H]
+  \begin{lstlisting}[language=json,firstnumber=1]
+{
+  "questionId": string,
+  "textAnswers": {
+    "answers": [
+    {
+      "value": string
+    }
+  ]
+  }
+}
+  \end{lstlisting}
+\end{figure}
+Formularze Google są tworzone z przesłanego do serwera zakodowanego w formacie JSON obiektu,
+którego opis można znaleźć w rozdziale ,,Instrukcja użytkownika''.
+Tworząc pytanie w formularzu, Google nadaje mu identyfikator i potem posługuje się nim
+zwracając przesłane do formularza odpowiedzi. Dla każdego pytania zwraca jego identyfikator 
+w polu \texttt{questionId} i odpowiedzi w tablicy \texttt{answers}. Trzeba było zatem dodać
+jakiś sposób, który pozwalałby na rozpoznanie, które pytanie w przesłanych odpowiedziach od 
+Google to pytanie w przesłanym zakodowanym formularzu od użytkownika. Prostym sposobem było
+dodanie bazy danych, która pamiętałaby zakodowany formularz razem jego identyfikatorem 
+na serwerach Google oraz sposób oceniania tego pytania. Serwer używa małej, lokalnej bazy
+danych \texttt{lowdb}. Tworzy ona pliki, w których przechowuje dane w formacie JSON.
+W przypadku naszej aplikacji lowdb tworzy plik o nazwie \texttt{db.json} w katalogu 
+\texttt{src/database}. Aplikacja automatycznie ocenia przesłane odpowiedzi w kilku krokach:
+\begin{enumerate}
+  \item pobiera przesłane odpowiedzi od Google,
+  \item dla każdej przesłanej odpowiedzi sprawdza, czy czas przesłania jest poprawny - po 
+    rozpoczęciu i przed zakończeniem testu,
+  \item dla każdej przesłanej odpowiedzi:
+    \begin{enumerate}
+      \item identyfikuje, które odpowiedzi dotyczą którego pytania,
+      \item sprawdza, czy odpowiedzi są poprawne,
+      \item przydziela liczbę punktów zgodnie z wprowadzonym przez użytkownika sposobem
+        oceniania, więcej w rozdziale ,,Instrukcja użytkownika'',
+    \end{enumerate}
+  \item ewentualnie generuje plik EXCEL z listą osób, które wzięły udział w teście
+    i ich wynikiem.
+\end{enumerate}
+
  
 \subsection{Katalog assets}
 Wszystkie obrazki z tekstem ze wstawkami w języku \LaTeX  oraz wszystkie inne pliki, które
@@ -73,8 +138,12 @@ go nie usuwać. Zawartość tego katalogu można usunąć oprócz pliku \texttt{
 wygenerowane obrazki są używane tylko podczas tworzenia lub edytowania formularza.
 
 \subsection{Katalog src/credentials}
+W tym katalogu należy umieścić dane uwierzytelniające projektu Google. Więcej informacji można
+znaleźć w rozdziale ,,Instrukcja użytkownika''. Należy nie usuwać tego katalogu.
 
 \subsection{Katalog src/excels}
+W tym katalogu można znaleźć wygenerowane podczas oceniania pliki EXCEL z wynikami. Nie należy go
+usuwać, ale jego zawartość już można.
 
 \subsection{ESLint}
 Do aplikacji serwera został dodany ESLint, który pomaga pisać przejrzysty kod i na bieżąco
@@ -82,3 +151,45 @@ analizuje kod i sprawdza, czy nie zawiera on błędów. To zachowanie można dow
 zasad udostępnionych przez to narzędzie. Zasady skonfigurowane dla tego projektu można znaleźć 
 w pliku \texttt{.eslintrc.json}. W celu dokładniejszego zrozumienia, jak działa to narzędzie 
 zachęcam do zapoznania się z dokumentacją.
+
+\section{Skrypt w języku Python}
+
+Głównym zadaniem skryptu jest generowanie obrazków ze wstawkami w języku \LaTeX \ i zostało
+już to napisane w poprzedniej wersji narzędzia. W tej pracy rozwinęliśmy go, dodając do
+niego wgrywanie utworzonych obrazków do serwisu Imgur oraz opcję generowania
+obrazków, które będą odpowiedziami do pytania. Poprzednia wersja narzędzia pozwalała
+wgrywać wygenerowane obrazki tylko w miejsce pytania w formularzu Google.
+
+\subsection{Imgur API}
+% nowy template odpowiedzi
+Ważną częścią funkcjonalności narzędzia jest tworzenie pytań ze wstawkami w języku \LaTeX.
+Jest to realizowane przez konwertowanie wstawek do obrazków, a następnie dodawanie ich do 
+formularzy w miejscu pytania lub odpowiedzi. Jak zostało wspomniane wcześniej narzędzie
+przestało korzystać z Google Apps Script i zamiast tego korzysta teraz z Google Forms API.
+Wysyłając zapytania, które mają dodać pytanie do formularza z obrazkiem, Google Forms API
+przyjmuje tylko zewnętrzne URL, z których może pobrać te obrazki, nie da się ich
+bezpośrednio przesłać razem z zapytaniem. Pojawił się, więc problem jak udostępnić te
+obrazki do pobrania. Postanowiłam wykorzystać do tego Imgur i Imgur API. Skrypt w języku Python,
+który można znaleźć w katalogu \texttt{src/tex2png}, tworzy obrazki, a następnie przesyła je 
+do Imgur API, a z powrotem otrzymuje adresy, które serwer przesyła do Google Forms API.
+Następnie Google pobiera obrazy z podanych adresów i dodaje pytanie do formularza Google.
+
+\subsection{Pliki graficzne w odpowiedziach do pytań}
+Kolejną dodaną do narzędzia funkcjonalnością jest możliwość generacji odpowiedzi do pytań
+w formularzu ze wstawkami w języku \LaTeX. Poprzednio było to możliwe tylko dla treści samych
+pytań, ponieważ Google Apps Script nie oferował takiej możliwości, natomiast Google Forms API 
+już na to pozwala. Pojawił się za to inny problem. Formularze Google wyświetlają odpowiedzi,
+które są plikami graficznymi
+w dość niefortunny sposób:
+\begin{figure}[H]
+  \centering
+   \includegraphics[scale=0.50]{odpowiedzi.png}
+   \caption{Wygląd przykładowego formularza}
+   \label{fig:1}
+ \end{figure}
+ Dwie odpowiedzi zawsze zostaną umieszczona blisko siebie, więc pliki graficzne z odpowiedziami
+ muszą być wąskie. Nie da się tego zmienić w żaden sposób. Dlatego do skryptu Google został
+ dopisany inny sposób generacji plików graficznych \\z odpowiedziami do pytań.
+
+ \section{Interfejs użytkownika}
+ 
