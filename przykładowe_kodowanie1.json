@@ -1,0 +1,33 @@
+{
+  "title": "Odpowiedzi z tex",
+  "questions": [
+    {
+      "type": "list",
+      "text": "$x = 5^2$ Ile wynosi x?",
+      "tex": true,
+      "answers": [
+        {
+          "text": "$ 25 $",
+          "correct": false,
+          "tex": true
+        },
+        {
+          "text": "Poprawna odpowiedź to oczywiście $ x^3 $",
+          "correct": true,
+          "tex": true
+        },
+        {
+          "text": "x jest równy $ 5 \\times 5 $",
+          "correct": false,
+          "tex": true
+        },
+        {
+          "text": "$5^2$ to 125, więc oczywiście $ x = 125 $",
+          "correct": false,
+          "tex": true
+        }
+      ],
+      "points": 5
+    }
+  ]
+}
