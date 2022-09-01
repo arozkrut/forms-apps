@@ -286,7 +286,35 @@ reprezentujące modele danych przesyłanych z serwera:
 Dodatkowo znajduje się tam typ wyliczeniowy \texttt{QuestionType} z typami pytań.
 
 \subsection{Material UI}
+Implementacja korzysta z wiele komponentów z biblioteki Material UI takich jak:
+\begin{itemize}
+  \item \texttt{Alert} i \texttt{Collapse}, żeby wyświetlić ewentualne błędy,
+  \item kontenery \texttt{List}, \texttt{ListItem}, \texttt{Box}, \texttt{Stack},
+    \texttt{Accordion}, \texttt{Card},
+  \item \texttt{Button}, żeby w łatwy sposób zaimplementować przyciski
+    i ich logikę,
+  \item \texttt{CircularProgress}, żeby wyświetlić animację ładowania, kiedy
+    użytkownik musi poczekać na zakończenie jakiejś operacji,
+  \item \texttt{Typography}, żeby wyświetlić tekst,
+  \item \texttt{Dialog}, żeby zaimplementować dialogi,
+  \item ikony.
+\end{itemize}
+Wszystkie te komponenty są niezwykle proste w użyciu oraz wyglądają przejrzyście
+i łatwo do zrozumienia.
 \subsection{Code Block}
+Jeszcze jednym ważnym komponentem jest \texttt{CodeBlock} z biblioteki react-code-blocks.
+Pozwala on łatwo wyświetlać fragmenty kodu razem z numerami linii i kolorowaniem
+tekstu w zależności od języka kodu. Jest on wykorzystywany w komponencie FormCard.
 \subsection{Daty}
+Narzędzie pozwala określać rozpoczęcie i zakończenia testu, więc należało
+zaimplementować zarządzanie datami. Aplikacja używa do tego biblioteki date-fns,
+która jest lekka i prosta w użyciu. Przykładowo używamy funkcji \texttt{format}, żeby
+ładnie wyświetlić daty we wpisach o formularzach.
+
 \subsection{ESLint}
+Podobnie jak w serwerze, tutaj również został użyty ESLint. W pliku
+\texttt{.eslintrc.json}~zostały określone zasady dla projektu korzystającego
+z języka TypeScript oraz środowiska React.
+
+\section{Vagrant i Ansible}
  
