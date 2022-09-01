@@ -112,7 +112,7 @@ w polu \texttt{questionId} i odpowiedzi w tablicy \texttt{answers}. Trzeba było
 jakiś sposób, który pozwalałby na rozpoznanie, które pytanie w przesłanych odpowiedziach od 
 Google to pytanie w przesłanym zakodowanym formularzu od użytkownika. Prostym sposobem było
 dodanie bazy danych, która pamiętałaby zakodowany formularz razem jego identyfikatorem 
-na serwerach Google, identyfikatorami pytań oraz sposobem oceniania tych pytania. Serwer
+na serwerach Google, identyfikatorami pytań oraz sposobem oceniania tych pytań. Serwer
 używa małej, lokalnej bazy
 danych \texttt{lowdb}. Tworzy ona pliki, w których przechowuje dane w formacie JSON.
 W przypadku naszej aplikacji lowdb tworzy plik o nazwie \texttt{db.json} w katalogu 
@@ -280,7 +280,7 @@ Aplikacja używa komponentów funkcyjnych oraz Reactowych hooków takich jak \te
 reprezentujące modele danych przesyłanych z serwera:
 \begin{itemize}
   \item \texttt{AnswerTemplate}: jedna odpowiedź do pytania w formularzu,
-  \item \texttt{QuestionTemplate}: jedno pytania w formularzu,
+  \item \texttt{QuestionTemplate}: jedno pytanie w formularzu,
   \item \texttt{FormTemplate}: formularz.
 \end{itemize}
 Dodatkowo znajduje się tam typ wyliczeniowy \texttt{QuestionType} z typami pytań.
@@ -317,4 +317,36 @@ Podobnie jak w serwerze, tutaj również został użyty ESLint. W pliku
 z języka TypeScript oraz środowiska React.
 
 \section{Vagrant i Ansible}
- 
+Plik \texttt{Vagrantfile} służy do konfiguracji maszyny wirtualnej i środowiska,
+na której będzie działać narzędzie. Wyjaśnię teraz krótko, jak działa ten 
+skrypt. Pole \texttt{config.vm.box} określa jaki system operacyjny zostanie
+użyty, w naszym przypadku jest to Ubuntu 20.04.4 LTS (Focal Fossa). 
+Następnie skrypt instaluje Ansible i definiuje ścieżkę do playbooka Ansible,
+który jest opisany w dalszej części tego rozdziału. W następnej części
+udostępniamy porty na maszynie wirtualnej przez porty na systemie, na którym
+działa ta maszyna.
+\begin{verbatim}
+  config.vm.network :forwarded_port, guest: 80, host: 8001
+\end{verbatim}
+W powyższym przykładzie udostępniamy port 8001 na maszynie wirtualnej
+przez port 80 na systemie użytkownika. Dalej skrypt konfiguruje pamięć, którą
+będzie mogła wykorzystać maszyna wirtualna i na końcu wypisuje wiadomość z adresami,
+które należy odwiedzić po jej uruchomieniu. Przydatne polecenia:
+\begin{itemize}
+  \item \texttt{vagrant up}: uruchamia maszynę wirtualną,
+  \item \texttt{vagrant halt}: zatrzymuje maszynę wirtualną,
+  \item \texttt{vagrant reload}: resetuje maszynę wirtualną,
+  \item \texttt{vagrant destroy}: usuwa maszynę wirtualną,
+  \item \texttt{vagrant provision}: przeprowadza od początku proces konfiguracji
+    maszyny razem z ponownym zainstalowaniem zależności z playbooka Ansible.
+\end{itemize}
+
+\subsection{Playbook}
+Playbook to plik w formacie yaml, który określa jakie programy i biblioteki
+powinny zostać zainstalowane oraz jakie usługi powinny zostać uruchomione po
+uruchomieniu maszyny wirtualnej. Można go znaleźć w katalogu \texttt{playbooks}
+pod nazwą \texttt{playbook.yaml}. Są w nim określone wszystkie programy
+i biblioteki opisane w rozdziale ,,Środowisko'' oraz są w nim dodane polecenia
+uruchomienia usług przez menadżera systemu \texttt{systemd}. Te usługi uruchamiają
+aplikacje serwera oraz interfejsu użytkownika i ich konfigurację można znaleźć
+odpowiednio w plikach \texttt{forms-app.service} i \texttt{forms-app-ui.service}.
