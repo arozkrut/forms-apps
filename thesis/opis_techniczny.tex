@@ -8,7 +8,7 @@ Kod projektu można podzielić na cztery główne części:
   \item serwer komunikujący się z zewnętrznymi API oraz bazą danych,
   \item kod służący do instalacji zależności i uruchamiania aplikacji na maszynie wirtualnej 
   - korzystający z technologii Vagrant i Ansible,
-  \item skrypt w języku Python konwertujący wstawki w języku \LaTeX do obrazów.
+  \item skrypt w języku Python konwertujący wstawki w języku \LaTeX\ do obrazów.
 \end{enumerate}
 
 \section{Serwer}
@@ -24,14 +24,15 @@ pod którymi można się z nim komunikować używając protokołu http:
   \item \texttt{POST /forms}: pod ten adres można wysłać formularz w kodowaniu JSON, żeby
     stworzyć nowy formularz Google,
   \item \texttt{PUT /forms/:id}: pod ten adres można wysłać zakodowany formularz w formacie
-    JSON, żeby edytować formularz o podanym identyfikatorze, edytowany jest formularz
+    JSON, żeby edytować formularz o podanym identyfikatorze; edytowany jest formularz
     w lokalnej bazie danych oraz formularz Google,
   \item \texttt{GET /forms/:id/answers}: zwraca wszystkie przesłane odpowiedzi,
   \item \texttt{GET /forms/:id/scores}: zwraca wszystkie ocenione przesłane odpowiedzi,
   \item \texttt{GET /forms/:id/scores}: przesyła plik EXCEL z ocenionymi przesłanymi 
     odpowiedziami,
   \item \texttt{DELETE /forms/:id}: usuwa formularz o podanym identyfikatorze z lokalnej bazy
-    danych oraz usuwa wszystkie pytania z formularza Google, ale nie jego samego
+    danych oraz usuwa wszystkie pytania z formularza Google, ale nie usuwa formularza z
+    dysku Google.
 \end{itemize}
 Kod z konfiguracją tych adresów można znaleźć w pliku \texttt{src/server.js}. Aplikacja
 z interfejsem użytkownika używa tych adresów, żeby komunikować się z serwerem.
@@ -56,10 +57,10 @@ wielu funkcjonalności, które pozwoliłoby na dalszy rozwój narzędzia.
 darmowe dla każdej osoby posiadającej konto Google i jest dokładnie opisane w następnym rozdziale.
 Następnie użytkownik może pozwolić aplikacji zarządzać formularzami na swoim dysku Google bez obaw, 
 że ktokolwiek inny miałby do nich dostęp. Serwer wysyła do Google Forms API zapytania i dostaje
-przejrzyste odpowiedzi w formacie JSON. Na ten moment API pozwala zarządzać formularzami oraz
+ odpowiedzi w formacie JSON. Na ten moment API pozwala zarządzać formularzami oraz
 przesłanymi do nich odpowiedziami, co pozwala na napisanie naszego własnego sposobu oceniania tych
 odpowiedzi. Google Forms API udostępnia automatyczne ocenianie, ale za każde pytanie można
-dostać tylko zero lub maksymalną liczbę punktów, co jest niewystarczające. Chcielibyśmy móc
+dostać tylko zero albo maksymalną liczbę punktów, co jest niewystarczające. Chcielibyśmy móc
 za każde pytanie przydzielić przykładowo połowę punktów, jeśli nie zostały zaznaczone wszystkie
 poprawne odpowiedzi. W tej pracy udało się to zrealizować.
 
@@ -111,7 +112,8 @@ w polu \texttt{questionId} i odpowiedzi w tablicy \texttt{answers}. Trzeba było
 jakiś sposób, który pozwalałby na rozpoznanie, które pytanie w przesłanych odpowiedziach od 
 Google to pytanie w przesłanym zakodowanym formularzu od użytkownika. Prostym sposobem było
 dodanie bazy danych, która pamiętałaby zakodowany formularz razem jego identyfikatorem 
-na serwerach Google oraz sposób oceniania tego pytania. Serwer używa małej, lokalnej bazy
+na serwerach Google, identyfikatorami pytań oraz sposobem oceniania tych pytania. Serwer
+używa małej, lokalnej bazy
 danych \texttt{lowdb}. Tworzy ona pliki, w których przechowuje dane w formacie JSON.
 W przypadku naszej aplikacji lowdb tworzy plik o nazwie \texttt{db.json} w katalogu 
 \texttt{src/database}. Aplikacja automatycznie ocenia przesłane odpowiedzi w kilku krokach:
@@ -127,7 +129,7 @@ W przypadku naszej aplikacji lowdb tworzy plik o nazwie \texttt{db.json} w katal
         oceniania, więcej w rozdziale ,,Instrukcja użytkownika'',
     \end{enumerate}
   \item ewentualnie generuje plik EXCEL z listą osób, które wzięły udział w teście
-    i ich wynikiem.
+    i ich wynikami.
 \end{enumerate}
 
  
@@ -167,7 +169,7 @@ Jest to realizowane przez konwertowanie wstawek do obrazków, a następnie dodaw
 formularzy w miejscu pytania lub odpowiedzi. Jak zostało wspomniane wcześniej narzędzie
 przestało korzystać z Google Apps Script i zamiast tego korzysta teraz z Google Forms API.
 Wysyłając zapytania, które mają dodać pytanie do formularza z obrazkiem, Google Forms API
-przyjmuje tylko zewnętrzne URL, z których może pobrać te obrazki, nie da się ich
+przyjmuje tylko zewnętrzne URL, z których może pobrać te obrazki. Nie da się ich
 bezpośrednio przesłać razem z zapytaniem. Pojawił się, więc problem jak udostępnić te
 obrazki do pobrania. Postanowiłam wykorzystać do tego Imgur i Imgur API. Skrypt w języku Python,
 który można znaleźć w katalogu \texttt{src/tex2png}, tworzy obrazki, a następnie przesyła je 
@@ -187,9 +189,13 @@ w dość niefortunny sposób:
    \caption{Wygląd przykładowego formularza}
    \label{fig:1}
  \end{figure}
- Dwie odpowiedzi zawsze zostaną umieszczona blisko siebie, więc pliki graficzne z odpowiedziami
- muszą być wąskie. Nie da się tego zmienić w żaden sposób. Dlatego do skryptu Google został
- dopisany inny sposób generacji plików graficznych \\z odpowiedziami do pytań.
+ Dwie odpowiedzi zawsze zostaną umieszczona obok siebie, więc pliki graficzne z odpowiedziami
+ muszą być wąskie. Inaczej tekst odpowiedzi byłby bardzo mały. Nie da się tego zmienić w żaden
+ sposób. Dlatego do skryptu Google został
+ dopisany inny sposób generacji plików graficznych z odpowiedziami do pytań.
 
  \section{Interfejs użytkownika}
+ Kod źródłowy aplikacji implementującej interfejs użytkownika znajduje się w katalogu
+ \texttt{forms-app-ui}. Aplikacja używa środowiska React i została stworzona używając programu
+ \texttt{Create React App}.
  
