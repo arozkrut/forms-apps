@@ -41,7 +41,7 @@ zapytania wysyłane do Google Forms API lub oceniają zamknięte pytania w przes
 odpowiedziach i konwertują je do formatów JSON lub EXCEL. Plik \texttt{jsonValidator.js}
 zawiera walidator zakodowanych formularzy w formacie JSON, który jest dokładnie opisany
 w pracy \ap. W katalogu \texttt{tex2png} znajduje się moduł, który służy do uruchamiania
-skryptu w języku Python, który tworzy obrazki ze wstawkami w języku \LaTeX i udostępnia
+skryptu w języku Python, który tworzy obrazki ze wstawkami w języku \LaTeX\ i udostępnia
 je na serwisie Imgur.
 
 \subsection{Google Forms API}
@@ -128,20 +128,20 @@ W przypadku naszej aplikacji lowdb tworzy plik o nazwie \texttt{db.json} w katal
       \item przydziela liczbę punktów zgodnie z wprowadzonym przez użytkownika sposobem
         oceniania, więcej w rozdziale ,,Instrukcja użytkownika'',
     \end{enumerate}
-  \item ewentualnie generuje plik EXCEL z listą osób, które wzięły udział w teście
-    i ich wynikami.
+  \item opcjonalnie generuje plik EXCEL z listą osób, które wzięły udział w teście
+    i~ ich wynikami.
 \end{enumerate}
 
  
 \subsection{Katalog assets}
-Wszystkie obrazki z tekstem ze wstawkami w języku \LaTeX  oraz wszystkie inne pliki, które
+Wszystkie obrazki z tekstem ze wstawkami w języku \LaTeX\ oraz wszystkie inne pliki, które
 powstają podczas ich tworzenia są generowane w katalogu \texttt{assets}, dlatego ważne jest, żeby
-go nie usuwać. Zawartość tego katalogu można usunąć oprócz pliku \texttt{.gitignore}, ponieważ
+go nie usuwać. Zawartość tego katalogu można usunąć (oprócz pliku \texttt{.gitignore}), ponieważ
 wygenerowane obrazki są używane tylko podczas tworzenia lub edytowania formularza.
 
 \subsection{Katalog src/credentials}
 W tym katalogu należy umieścić dane uwierzytelniające projektu Google. Więcej informacji można
-znaleźć w rozdziale ,,Instrukcja użytkownika''. Należy nie usuwać tego katalogu.
+znaleźć w rozdziale ,,Instrukcja użytkownika''. Nie należy usuwać tego katalogu.
 
 \subsection{Katalog src/excels}
 W tym katalogu można znaleźć wygenerowane podczas oceniania pliki EXCEL z wynikami. Nie należy go
@@ -189,13 +189,16 @@ w dość niefortunny sposób:
    \caption{Wygląd przykładowego formularza}
    \label{fig:1}
  \end{figure}
- Dwie odpowiedzi zawsze zostaną umieszczona obok siebie, więc pliki graficzne z odpowiedziami
- muszą być wąskie. Inaczej tekst odpowiedzi byłby bardzo mały. Nie da się tego zmienić w żaden
- sposób. Dlatego do skryptu Google został
- dopisany inny sposób generacji plików graficznych z odpowiedziami do pytań.
+Dwie odpowiedzi zawsze zostaną umieszczona obok siebie, więc pliki graficzne z odpowiedziami
+muszą być wąskie. Inaczej tekst odpowiedzi byłby bardzo mały. Zmiana wyświetlania odpowiedzi
+z plikami graficznymi jest na ten moment niemożliwa. Dlatego do skryptu Google został dopisany inny sposób generacji plików graficznych z odpowiedziami do pytań.
 
- \section{Interfejs użytkownika}
- Kod źródłowy aplikacji implementującej interfejs użytkownika znajduje się w katalogu
- \texttt{forms-app-ui}. Aplikacja używa środowiska React i została stworzona używając programu
- \texttt{Create React App}.
+\section{Interfejs użytkownika}
+Kod źródłowy aplikacji implementującej interfejs użytkownika znajduje się w katalogu
+\texttt{forms-app-ui}. Aplikacja używa środowiska React i została stworzona używając programu
+\texttt{Create React App}. Pliki \texttt{index.tsx} oraz \texttt{index.html}
+tworzą podstawę całej aplikacji. W pliku \texttt{index.tsx} jest wstrzykiwany Reactowy
+komponent \texttt{App}, który jest głównym komponentem całej aplikacji. W katalogu 
+\texttt{src/components} można znaleźć wszystkie inne komponenty, które tworzą aplikację.
+Aplikacja używa komponentów funkcyjnych oraz hooków. 
  

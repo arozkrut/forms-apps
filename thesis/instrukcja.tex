@@ -32,14 +32,14 @@ a w tej pracy spróbuję krótko opisać ten proces:
     \end{itemize}
   \item wygenereuj Klucz interfejsu API
     \begin{itemize}
-      \item przejdź do strony projektu
+      \item przejdź do strony projektu,
       \item w menu po lewej stronie wybierz ,,Dane logowania'',
       \item kliknij ,,Create Credentials'', a potem ,,Klucz interfejsu API'',
       \item zapisz klucz w pliku i zachowaj na później,
     \end{itemize}
   \item skonfiguruj ekran zgody
     \begin{itemize}
-      \item przejdź do strony projektu
+      \item przejdź do strony projektu,
       \item ponownie kliknij ,,Create Credentials'', a potem 
             ,,Identyfikator Klienta OAuth'',
       \item kliknij ,,Skonfiguruj Ekran Zgody'',
@@ -54,9 +54,9 @@ a w tej pracy spróbuję krótko opisać ten proces:
     \end{itemize}
   \item wygeneruj identyfikator klienta OAuth
     \begin{itemize}
-      \item przejdź do strony projektu
+      \item przejdź do strony projektu,
       \item wybierz ponownie ,,Dane Logowania'', ,,Create Credentials''
-            i ,,Identyfikator Klienta OAuth''
+            i ,,Identyfikator Klienta OAuth'',
       \item jako typ aplikacji wybierz ,,Aplikacja internetowa'', dodaj URI 
             \\ \texttt{http://localhost:3000/oauth2callback} do sekcji ,,Autoryzowane 
             identyfikatory URI przekierowania'' i kliknij ,,Utwórz'',
@@ -70,11 +70,11 @@ z formułami matematycznymi, z których pobiera je serwer Google. Do komunikacji
 z Imgur API również potrzebujemy danych uwierzytelniania:
 \begin{itemize}
   \item zaloguj się do Imgur,
-  \item odwiedź stronę \href{https://api.imgur.com/}{Imgur API}
+  \item odwiedź stronę \href{https://api.imgur.com/}{Imgur API},
   \item znajdź ,,Register an application'',
   \item wypełnij dane, jako typ autoryzacji wybierz ,,OAuth2 authorization without
   a callback URL'',
-  \item skopiuj Client ID i Client secret i zachowaj na później
+  \item skopiuj Client ID i Client secret i zachowaj na później.
 \end{itemize}
 
 \subsection{Repozytorium}
@@ -116,7 +116,7 @@ w sekcji ,,Porty''. Instalacja może
 chwilę potrwać. Po jej zakończeniu wyświetli się wiadomość z linkiem prowadzącym
 do strony uwierzytelniania Google, gdzie trzeba wybrać konto Google, na którym
 będą przechowywane formularze oraz wyrazić zgodę na nadanie aplikacji dostępu do
-formularzy na tym koncie Google. Następnie w przeglądarce należy odwiedzić adres
+formularzy na tym koncie. Następnie w przeglądarce należy odwiedzić adres
 \href{http://localhost:9091}{http://localhost:9091}, gdzie działa interfejs
 użytkownika. Narzędzie jest gotowe do pracy.
 
@@ -132,7 +132,7 @@ zmienić na inny, ale 3000 już nie. Opis jak to zrobić można znaleźć w sekc
 Po uruchomieniu serwera w przeglądarce powinna otworzyć się
 strona uwierzytelniania Google, gdzie trzeba wybrać konto Google, na którym
 będą przechowywane formularze oraz wyrazić zgodę na nadanie aplikacji dostępu do
-formularzy na tym koncie Google. Po tym w katalogu \texttt{src/forms-app-ui}
+formularzy na tym koncie. Po tym w katalogu \texttt{src/forms-app-ui}
 należy włączyć serwer interfejsu użytkownika poleceniem \texttt{npm start}, który
 uruchomi się pod adresem \href{http://localhost:9091}{http://localhost:9091}.
 Port 9091 na którym działa aplikacja można również zmienić na inny.
@@ -249,7 +249,9 @@ wymagane. Poniżej znajduje się szczegółowy opis pól i wartości:
     \item{answers} -- tablica, każde pole zawiera jedną z możliwych odpowiedzi w
     następującej formie:
     \begin{itemize}
-      \item text -- pole tekstowe, treść danej odpowiedzi,
+      \item text -- pole tekstowe, treść danej odpowiedzi; podobnie jak w treści
+        pytania wszystkie wystąpienia ,,$\backslash$'' należy zastąpić 
+        ,,$\backslash\backslash$'',
       \item tex -- wartość boolowska, jeśli \textbf{true} treść odpowiedzi (text) będzie
       konwertowana do obrazu z zachowaniem konwersji symboli matematycznych i innych
       wstawek z \LaTeX{}'a z biblioteki standardowej, tylko dla pytań typu list i checkBox,
@@ -266,14 +268,9 @@ wymagane. Poniżej znajduje się szczegółowy opis pól i wartości:
     odpowiedź, zostanie przyznane 0 punktów, jeśli zostanie udzielona jedna dobra odpowiedź,
     zostanie przydzielony 1 punkt i jeśli zostaną udzielone dwie dobre odpowiedzi, zostaną
     przydzielone 3 punkty
-    --- \textbf{pole opcjonalne}
+    --- \textbf{pole opcjonalne}.
   \end{itemize}
 \end{itemize}
-
-Bardzo ważne jest to, że tekst odpowiedzi i pytań ze wstawkami matematycznymi
-musi być postaci \texttt{"\$ 5 \textbackslash \textbackslash times 5 \$"}, jeśli
-chcemy uzyskać pytanie z tekstem $ 5 \times 5 $. Każde polecenie zaczynające się
-odwrotnym ukośnikiem musi zaczynać się dwoma ukośnikami.
 
 \subsection{Automatyczne ocenianie}
 Pytania typu list, checkBox i grid mogą zostać automatycznie ocenione i wyniki mogą zostać
@@ -307,8 +304,8 @@ formularza i ewentualnie czas rozpoczęcia i zakończenia testu. Po kliknięciu
 się na liście na głównej stronie aplikacji. Przycisk ,,Dodaj istniejący'' otworzy
 dialog, gdzie możemy podać identyfikator istniejącego już formularza, który chcemy
 dodać do listy formularzy zarządzanych przez aplikację. Musimy również podać jego
-kodowanie. Po kliknięciu ,,Dodaj'' formularz zostanie edytowany i pojawi się na 
-liście formularzy. Na liście formularzy każdy wpis odpowiada jednemu formularzowi
+kodowanie. Po kliknięciu ,,Dodaj'' formularz zostanie edytowany. 
+Na liście formularzy każdy wpis odpowiada jednemu formularzowi
 na dysku Google użytkownika, jednak nie wszystkie formularze na dysku się tu pojawią,
 jedynie te stworzone przez aplikację lub dodane używając przycisku ,,Dodaj istniejący''.
 W każdym wpisie możemy znaleźć przyciski:

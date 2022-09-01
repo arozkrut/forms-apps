@@ -9,7 +9,7 @@ pracy.
   \item serwer komunikujący się z zewnętrznymi API oraz bazą danych,
   \item kod służący do instalacji zależności i uruchamiania aplikacji na maszynie wirtualnej 
   - korzystający z technologii Vagrant i Ansible
-  \item skrypt w języku Python konwertujący wstawki w języku \LaTeX do obrazów.
+  \item skrypt w języku Python konwertujący wstawki w języku \LaTeX\ do obrazów.
 \end{enumerate}
 Dodatkowo aplikacja korzysta z Google Forms API oraz Imgur API.
 
@@ -27,7 +27,7 @@ emotion/react, emotion/styled, types/react, types/react-dom,
 react, react-dom, react-scripts.
 
 \subsection{Material UI}
-Biblioteka, która udostępnia wiele gotowych komponentów, których można użyć w
+Biblioteka udostępniająca wiele gotowych komponentów, których można użyć w~
 aplikacjach korzystających z Reacta. 
 
 \subsection{axios}
@@ -68,7 +68,7 @@ na niej wszystkie aplikacje potrzebne do działania narzędzia.
 \section{Google Forms API oraz Imgur API}
 
 \subsection*{Google Forms API}
-Google Forms API to API, które umożliwia zarządzania Formularzami Google na dysku
+Google Forms API to interfejs, który umożliwia zarządzania Formularzami Google na dysku
 użytkownika. W czasie pisania tej pracy jest to wciąż bardzo nowe narzędzie, ponieważ
 jego pierwsza oficjalna wersja została opublikowana w 2022 roku. API pozwala m.in. zarządzać
 pytaniami i odpowiedziami, zmieniać ustawienia formularza i włączać automatyczne ocenianie.
@@ -76,9 +76,10 @@ Jest ono wciąż dynamicznie rozwijane.
 
 \subsection*{Imgur API}
 Imgur API pozwala zarządzać plikami użytkownika na platformie Imgur, w tym dodawać je jako
-zalogowany lub niezalogowany użytkownik. Obrazy z pytaniami, które zostają utworzone, jeśli
-pytanie zawiera wstawki w języku \LaTeX, zostają wgrane na serwery Imgur, żeby serwery Google
-mogły je pobrać używając zewnętrznego URL podczas tworzenia formularza.
+zalogowany lub niezalogowany użytkownik. Jeśli pytanie, które ma zostać dodane do formularza, 
+zawiera wstawki w języku \LaTeX\, generowane są obrazy z tekstem pytania. Natstępnie 
+zostająv one wgrane na serwery Imgur, aby potem serwery Google
+mogły je pobrać używając zewnętrznego URL.
 
 \section{Python}
 Narzędzie korzysta ze skryptu w języku Python, aby stworzyć obrazy ze wstawkami w języku \LaTeX.
@@ -95,6 +96,6 @@ używany na systemach operacyjnych opierających się na Debianie.
 \section{LaTeX}
 Jak już wiele razy zostało wspomniane w tej pracy, narzędzie pozwala generować formularze ze 
 wstawkami
-w języku \LaTeX, zatem aby narzędzie działało poprawnie \LaTeX musi być zainstalowany 
-na maszynie, na którym narzędzie ma zostać uruchomione. Skrypt Ansible dodatkowo instaluje
+w języku \LaTeX, zatem aby narzędzie działało poprawnie \LaTeX\ musi być zainstalowany 
+na maszynie, na której narzędzie ma zostać uruchomione. Skrypt Ansible dodatkowo instaluje
 polski pakiet językowy.
