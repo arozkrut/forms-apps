@@ -116,7 +116,74 @@ na serwerach Google, identyfikatorami pytań oraz sposobem oceniania tych pytani
 używa małej, lokalnej bazy
 danych \texttt{lowdb}. Tworzy ona pliki, w których przechowuje dane w formacie JSON.
 W przypadku naszej aplikacji lowdb tworzy plik o nazwie \texttt{db.json} w katalogu 
-\texttt{src/database}. Aplikacja automatycznie ocenia przesłane odpowiedzi w kilku krokach:
+\texttt{src/database}. Zakodowane formularze w bazie danych wyglądają następująco:
+
+\begin{figure}[H]
+  \begin{lstlisting}[language=json,firstnumber=1]
+FormTemplate {
+  id: string, // identyfikator formularza
+  title: string, // nazwa formularza
+  questions: QuestionTemplate[], // tablica z pytaniami
+  description?: string, // opis
+  startDate?: string, // start testu
+  endDate?: string, // koniec testu
+  responderUri: string, // adres formularza Google
+}
+  \end{lstlisting}
+\end{figure}
+\begin{figure}[H]
+  \begin{lstlisting}[language=json,firstnumber=1]
+QuestionTemplate {
+  questionId?: string, // identyfikator pytania typu list, 
+                       // checkBox lub text
+  type: QuestionType,  // typ pytania
+  text: string, // tekst pytania
+  tex: boolean, // pytanie zawiera wstawki matematyczne, 
+                // gdy pole wynosi true
+  answers?: AnswerTemplate[], // tablica odpowiedzi do 
+                              // pytania
+  points?: number, // punkty dla pytania typu list
+  pointsArray?: Array<number> // tablica z punktami dla 
+                              // pytania typu grid
+}
+  \end{lstlisting}
+\end{figure}
+\begin{figure}[H]
+  \begin{lstlisting}[language=json,firstnumber=1]
+QuestionType {
+  list,
+  checkBox,
+  grid,
+  text,
+}
+  \end{lstlisting}
+\end{figure}
+\begin{figure}[H]
+  \begin{lstlisting}[language=json,firstnumber=1]
+AnswerTemplate {
+  questionId?: string, // identyfikator pytania dla typu 
+                       // grid
+  text: string, // tekst odpowiedzi
+  tex: boolean, // zawiera wstawki matematyczne, 
+                // gdy pole wynosi true
+  correct: boolean, // poprawna, gdy pole wynosi true
+}
+  \end{lstlisting}
+\end{figure}
+
+Pola oznaczone ,,?:'' to pola, którym można przypisać wartość null. 
+Pytania różnych typów różnią się od siebie swoim kodowaniem, ale 
+aby uprościć ich reprezentację, powstał jeden model mogący reprezentować
+je wszystkie. Jedna z różnic polega na tym, że dla pytań typu grid to
+odpowiedzi w schemacie formularza są tak naprawdę kolejnymi podpytaniami,
+więc każde takie podpytanie ma swój własny identyfikator. Zatem ich 
+identyfikatory są przechowywane w polu \texttt{questionId} w 
+\texttt{AnswerTemplate}. Identyfikatory pozostałych typów pytań są 
+przechowywane w \texttt{QuestionTemplate}. Kolejna różnica polega na tym,
+że pole \texttt{points} odnosi się tylko do pytań typu list, a pole 
+\texttt{pointsArray} dotyczy pytań checkBox i grid.
+\newpage
+Aplikacja automatycznie ocenia przesłane odpowiedzi w kilku krokach:
 \begin{enumerate}
   \item pobiera przesłane odpowiedzi od Google,
   \item dla każdej przesłanej odpowiedzi sprawdza, czy czas przesłania jest poprawny - po 
@@ -191,7 +258,8 @@ w dość niefortunny sposób:
  \end{figure}
 Dwie odpowiedzi zawsze zostaną umieszczona obok siebie, więc pliki graficzne z odpowiedziami
 muszą być wąskie. Inaczej tekst odpowiedzi byłby bardzo mały. Zmiana wyświetlania odpowiedzi
-z plikami graficznymi jest na ten moment niemożliwa. Dlatego do skryptu Google został dopisany inny sposób generacji plików graficznych z odpowiedziami do pytań.
+z plikami graficznymi jest na ten moment niemożliwa. Dlatego do skryptu Google został dopisany
+inny sposób generacji plików graficznych z odpowiedziami do pytań.
 
 \section{Interfejs użytkownika}
 Kod źródłowy aplikacji implementującej interfejs użytkownika znajduje się w katalogu
@@ -199,6 +267,26 @@ Kod źródłowy aplikacji implementującej interfejs użytkownika znajduje się 
 \texttt{Create React App}. Pliki \texttt{index.tsx} oraz \texttt{index.html}
 tworzą podstawę całej aplikacji. W pliku \texttt{index.tsx} jest wstrzykiwany Reactowy
 komponent \texttt{App}, który jest głównym komponentem całej aplikacji. W katalogu 
-\texttt{src/components} można znaleźć wszystkie inne komponenty, które tworzą aplikację.
-Aplikacja używa komponentów funkcyjnych oraz hooków. 
+\texttt{src/components} można znaleźć wszystkie inne komponenty, które tworzą aplikację:
+\begin{itemize}
+  \item \texttt{FormCard}: implementuje jeden wpis z informacjami o formularzu,
+  \item \texttt{FormList}: implementuje listę formularzy, czyli listę komponentów FormCard,
+  \item \texttt{CreateDialog}: dialog, za pomocą którego można stworzyć nowy formularz,
+  \item \texttt{AddDialog}: dialog, za pomocą którego można dodać już istniejący formularz,
+  \item \texttt{EditDialog}: dialog, za pomocą którego można edytować formularz.
+\end{itemize}
+Aplikacja używa komponentów funkcyjnych oraz Reactowych hooków takich jak \texttt{useState},
+\texttt{useEffect} i \texttt{useMemo}. W katalogu \texttt{src/models} znajdują się interfejsy
+reprezentujące modele danych przesyłanych z serwera:
+\begin{itemize}
+  \item \texttt{AnswerTemplate}: jedna odpowiedź do pytania w formularzu,
+  \item \texttt{QuestionTemplate}: jedno pytania w formularzu,
+  \item \texttt{FormTemplate}: formularz.
+\end{itemize}
+Dodatkowo znajduje się tam typ wyliczeniowy \texttt{QuestionType} z typami pytań.
+
+\subsection{Material UI}
+\subsection{Code Block}
+\subsection{Daty}
+\subsection{ESLint}
  
