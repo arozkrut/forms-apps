@@ -312,15 +312,15 @@ która jest lekka i prosta w użyciu. Przykładowo używamy funkcji \texttt{form
 ładnie wyświetlić daty we wpisach o formularzach.
 
 \subsection{ESLint}
-Podobnie jak w serwerze, tutaj również został użyty ESLint. W pliku
-\texttt{.eslintrc.json}~zostały określone zasady dla projektu korzystającego
+Podobnie jak w serwerze, tutaj również został użyty ESLint. W pliku\\
+\texttt{.eslintrc.json} zostały skonfigurowane zasady dla projektu korzystającego
 z języka TypeScript oraz środowiska React.
 
 \section{Vagrant i Ansible}
 Plik \texttt{Vagrantfile} służy do konfiguracji maszyny wirtualnej i środowiska,
 na której będzie działać narzędzie. Wyjaśnię teraz krótko, jak działa ten 
 skrypt. Pole \texttt{config.vm.box} określa jaki system operacyjny zostanie
-użyty, w naszym przypadku jest to Ubuntu 20.04.4 LTS (Focal Fossa). 
+użyty. W naszym przypadku jest to Ubuntu 20.04 LTS (Focal Fossa). 
 Następnie skrypt instaluje Ansible i definiuje ścieżkę do playbooka Ansible,
 który jest opisany w dalszej części tego rozdziału. W następnej części
 udostępniamy porty na maszynie wirtualnej przez porty na systemie, na którym
@@ -328,10 +328,10 @@ działa ta maszyna.
 \begin{verbatim}
   config.vm.network :forwarded_port, guest: 80, host: 8001
 \end{verbatim}
-W powyższym przykładzie udostępniamy port 8001 na maszynie wirtualnej
-przez port 80 na systemie użytkownika. Dalej skrypt konfiguruje pamięć, którą
+W powyższym przykładzie udostępniamy port 80 na maszynie wirtualnej
+przez port 8001 na systemie użytkownika. W dalszej części skrypt konfiguruje pamięć, którą
 będzie mogła wykorzystać maszyna wirtualna i na końcu wypisuje wiadomość z adresami,
-które należy odwiedzić po jej uruchomieniu. Przydatne polecenia:
+które należy odwiedzić w przeglądarce po jej uruchomieniu. Przydatne polecenia:
 \begin{itemize}
   \item \texttt{vagrant up}: uruchamia maszynę wirtualną,
   \item \texttt{vagrant halt}: zatrzymuje maszynę wirtualną,
@@ -345,8 +345,8 @@ które należy odwiedzić po jej uruchomieniu. Przydatne polecenia:
 Playbook to plik w formacie yaml, który określa jakie programy i biblioteki
 powinny zostać zainstalowane oraz jakie usługi powinny zostać uruchomione po
 uruchomieniu maszyny wirtualnej. Można go znaleźć w katalogu \texttt{playbooks}
-pod nazwą \texttt{playbook.yaml}. Są w nim określone wszystkie programy
-i biblioteki opisane w rozdziale ,,Środowisko'' oraz są w nim dodane polecenia
+pod nazwą \texttt{playbook.yaml}. Zawiera polecenia, które zainstalują wszystkie programy
+i biblioteki opisane w rozdziale ,,Środowisko''. Oprócz tego są w nim dodane polecenia
 uruchomienia usług przez menadżera systemu \texttt{systemd}. Te usługi uruchamiają
-aplikacje serwera oraz interfejsu użytkownika i ich konfigurację można znaleźć
+aplikacje serwera oraz interfejsu użytkownika i ich konfiguracje można znaleźć
 odpowiednio w plikach \texttt{forms-app.service} i \texttt{forms-app-ui.service}.
