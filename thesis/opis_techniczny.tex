@@ -338,7 +338,8 @@ które należy odwiedzić w przeglądarce po jej uruchomieniu. Przydatne polecen
   \item \texttt{vagrant reload}: resetuje maszynę wirtualną,
   \item \texttt{vagrant destroy}: usuwa maszynę wirtualną,
   \item \texttt{vagrant provision}: przeprowadza od początku proces konfiguracji
-    maszyny razem z ponownym zainstalowaniem zależności z playbooka Ansible.
+    maszyny razem z ponownym zainstalowaniem zależności z playbooka Ansible,
+  \item \texttt{vagrant ssh}: dodaje dostęp do powłoki maszyny wirtualnej.
 \end{itemize}
 
 \subsection{Playbook}
@@ -350,3 +351,18 @@ i biblioteki opisane w rozdziale ,,Środowisko''. Oprócz tego są w nim dodane 
 uruchomienia usług przez menadżera systemu \texttt{systemd}. Te usługi uruchamiają
 aplikacje serwera oraz interfejsu użytkownika i ich konfiguracje można znaleźć
 odpowiednio w plikach \texttt{forms-app.service} i \texttt{forms-app-ui.service}.
+
+\subsection{Przydatne polecenia}
+Po wykonaniu polecenia \texttt{vagrant ssh} uzyskuje się dostęp do powłoki maszyny wirtualnej.
+Pliki projektu znajduję się w katalogu \texttt{/vagrant}. Usługa z serwerem nazywa się 
+\texttt{forms-app}, a z interfejsem użytkownika \texttt{forms-app-ui}. Kilka przydatnych poleceń, 
+które można użyć w powłoce:
+\begin{itemize}
+  \item \texttt{systemctl status <nazwa\_usługi>}: wypisuje status usługi,
+  \item \texttt{systemctl list-units -all --type=service | grep forms-app}: wypisuje\\
+    status wszystkich usług, a następnie wybiera z nich tylko usługi forms-app i~forms-app-ui;
+    można w ten sposób sprawdzić, czy usługi są aktywne, 
+  \item \texttt{systemctl start <nazwa\_usługi>}: włącza usługę,
+  \item \texttt{systemctl stop <nazwa\_usługi>}: zatrzymuje usługę,
+  \item \texttt{journalctl -u <nazwa\_usługi>}: wypisuje logi usługi razem z logami aplikacji.
+\end{itemize}

@@ -1,1 +1,42 @@
 \chapter{Podsumowanie}
+Celem pracy był rozwój narzędzia służącego do zarządzania formularzami \mbox{Google}
+i pomagającego
+przeprowadzać testy oraz ankiety, używając tych formualarzy. Udało się dopisać kilka 
+nowych funkcjonalności
+i ulepszyć te już istniejące, ale wciąż istnieje wiele ulepszeń, które można dodaći funkcjonalności,
+które można ulepszyć. W dalszej częsci podsumowania opiszę kilka z nich.
+
+\subsection*{Automatyczne rozpoczynanie testów w podanym terminie}
+W tej wersji narzędzia użytkownik musi ręcznie utworzyć formularz lub go zaktualizować dokładnie 
+w tym momencie, w którym chciałby, żeby inni użytkownicy mogli zobaczyć dany formularz Google 
+i wysyłać do niego odpowiedzi. Z pewnością wygodne byłoby dodanie możliwości podania daty, kiedy 
+formularz ma zostać utworzony lub zaktualizowany.
+
+\subsection*{Automatyczne kończenie testów w podanym terminie}
+Podobnie wygodne byłoby kończenie testów w podanym terminie. Użytkownik musi ręcznie
+kliknąć, że nie chce akceptować odpowiedzi w ustawieniach formularza na stronie Google,
+kiedy chciałby zakończyć test, ale w przszłości, kiedy Google Forms API doda taką możliwość,
+można to zaprogramować.
+
+\subsection*{Zapamiętywanie poprzednich wersji formularzy}
+
+Jeśli użytkownik chce automatycznie oceniać przesłane
+odpowiedzi, nie może on edytować danego formularza po rozpoczęciu testu, ponieważ nawet pytania, 
+które już istnieją
+dostałyby nowe identyfikatory w bazie danych i niemożliwa byłaby identyfikacja pytań w poprzednio 
+przesłanych odpowiedziach. Ten problem można rozwiązać poprzez zapisywanie w bazie danych poprzednich
+wersji formularza razem z datami edycji. Baza danych Google pamięta wszystkie przesłane odpowiedzi,
+nawet te odpowiadające na już usunięte pytania, więc wystarczyłaby zmiana modelu w lokalnej bazie 
+danych. Wtedy można by też po zakończeniu testu usunąć pytania 
+i tylko wyświetlać informację, że test się już zakończył i automatyczne ocenianie wciąż by działało.
+
+\subsection*{Automatyczne włączenie opcji losowej kolejności pytań i zbierania adresów email}
+Google Forms API wciąż nie oferuje wielu przydatnych funkcji takich jak włączenie losowej kolejności 
+pytań w formularzu i zbierania adresów email. Jednak wciąż jest bardzo dynamicznie rozwijane, więc
+możliwe, że taka opcja pojawi się w przyszłości. Można by wtedy dodać te dwie rzeczy do narzędzia.
+
+\subsection*{Usuwanie formularzy z dysku Google}
+Na ten moment po usunięciu formularza w narzędziu, plik z formularzem Google nie jest usuwany
+z dysku Google użytkownika. Jest to spowodowane tym, że Google Forms API nie udostępnia takiej opcji,
+ale za to Google Drive API już to robi. Trzeba by więc dodać Google Drive API do projektu i
+zaimplementować usuwanie podanego pliku.
