@@ -385,27 +385,5 @@ app.delete('/forms/:id', async (req, res) => {
     }
 });
 
-// TODO: add fields for:
-// TODO: suffling questions and answers,
-// update: can't find property to shuffle questions
-// jedyne co można to w opcjach przed startem zmienić
-// settings -> presentation -> Shuffle question order na on
-// TODO: grading tests
-// punkty w template:
-// if list(radio): punkty w 'points'
-// if checkBox: array punktów za poprawnie wybrane: [0, 1, 2] lub [0, 0, 1]
-// (index to liczba poprawnie wybranych)
-// kara za wybranie nieprawidłowej: odejmujemy od liczby poprawnie wybranych 1
-// if grid: array punktów za poprawnie wybrane bez kar
-// TODO: cropping pictures
-// TODO: zacznij pisać tekst
-// TODO: zacznij pisać o jakichś problemach np. dlaczego dwa pliki tex,
-// jaka baza danch, google drive i formsy na nim (nic z nimi nie robimy)
-// TODO: pomyśl o strukturze
-// lista imion i nazwisk z adresami email (dodaj przycisk)
-// trzeba wejść i ręcznie kliknąć "zbieraj adresy e-mail", bo
-// google nie oferuje tego w API
-
-
 // Ustawienie portu, na którym serwer nasłuchuje
 app.listen(port);
