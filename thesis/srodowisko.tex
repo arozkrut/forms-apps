@@ -1,8 +1,8 @@
 \chapter{Środowisko}
 Praca jest rozszerzeniem innego projektu, wobec tego część użytych bibliotek zostało opisanych 
-w rozdziale ,,Środowisko'' pracy \ap. W niniejszym rozdziale skupię się więc na nowo dodanych
-elementach środowiska. W celu zapoznania się z całością polecam lekturę wymienionej 
-pracy.
+w rozdziale ,,Środowisko'' w pracy \ap. Nie chcę powtarzać opisu elementów zaimplementowanych 
+w bazowej pracy, więc w tym rozdziale skupię się na nowo dodanych
+elementach środowiska.
 \\ Kod projektu można podzielić na cztery główne części:
 \begin{enumerate}
   \item interfejs użytkownika,
@@ -16,58 +16,103 @@ Dodatkowo aplikacja korzysta z Google Forms API oraz Imgur API.
 \section{Interfejs użytkownika}
 
 \subsection{TypeScript}
-Aplikacja została napisana w języku TypeScript, który jest nadzbiorem języka JavaScript. 
-Aplikacja korzysta z bibliotek: 
-types/node, typescript.
+Aplikacja została napisana w języku TypeScript\cite{TypeScript},
+który jest nadzbiorem języka JavaScript. 
+Wszystkie programy napisane w TypeScripcie tłumaczą się bezpośrednio do języka JavaScript
+oraz wszystkie programy napisane w języku JavaScript są poprawnymi programami w języku TypeScript.
+TypeScript wnosi kilka nowych możliwości np. pozwala na opcjonalne statyczne typowanie 
+i programowanie obiektowe oparte na klasach. 
+Aplikacja korzysta z bibliotek: Definitely Typed\cite{DefinitelyTyped}, typescript\cite{typescript_}.
 
 \subsection{React}
-Technologia służąca do tworzenia interfejsów
-graficznych aplikacji internetowych. Aplikacja korzysta z bibliotek:
-emotion/react, emotion/styled, types/react, types/react-dom, 
-react, react-dom, react-scripts.
+React\cite{React} to technologia służąca do tworzenia interfejsów
+graficznych aplikacji internetowych. Jest szybki oraz oferuje wiele możliwości,
+które ułatwiają implementowanie aplikacji internetowych, głównie tzw. Single Page Applications.
+Przykładowo React przechowuje w pamięci wirtualny DOM aplikacji i po zmianie jego stanu porównuje
+wirtualny i prawdziwy DOM, po czym aktualizuje jego stan w przeglądarce. Sprawia to, że strona
+aplikacji zmieni się tylko, gdy faktycznie zostały wprowadzone jakieś zmiany
+i zmieniają się tylko niektóre elementy,
+a nie cała strona. Dzięki temu aplikacje korzystające z Reacta są szybkie.
+Oprócz tego React używa języka JSX. Jest on nakładką na język JavaScript, która umożliwia
+wstawianie kodu HTML lub komponentów React bezpośrednio w kodzie. 
+Aplikacja korzysta z bibliotek:
+emotion\cite{emotion}, react\cite{react_}, Create React App\cite{CreateReactApp}.
 
 \subsection{Material UI}
-Biblioteka udostępniająca wiele gotowych komponentów, których można użyć w~
-aplikacjach korzystających z Reacta. 
+Zazwyczaj nie ma sensu implementować od początku komponentów,
+które są często używane w niemal każdej aplikacji internetowej, ponieważ istnieje już
+wiele gotowych rozwiązań. Biblioteka Material UI\cite{MaterialUI} udostępniająca wiele
+gotowych komponentów, których można użyć w aplikacjach korzystających z Reacta. 
+Te komponenty są bardzo proste w użyciu i
+można łatwo zmienić ich wygląd według własnych preferencji.
+Dodatkowo Material UI posiada obszerną i przejrzystą dokumentację.
 
 \subsection{axios}
-Biblioteka służąca do wysyłania zapytań http i pobierania danych z serwera.
+Biblioteka axios\cite{axios} służy do wysyłania zapytań http. Bazuje ona na typie Promise z języka
+JavaScript. Można jej użyć zarówno w aplikacjach używających Node.js, jak i
+aplikacjach przeglądarkowych. W projekcie służy do wysyłania zapytań do serwera,
+które zwracają dane o formularzach lub ocenach, tworzą nowe formularze lub 
+edytują już istniejące.
 
 \subsection{date-fns}
-Biblioteka pomagająca zarządzać datami. Udostępnia wiele użytecznych funkcji.
+Biblioteka date-fns\cite{date-fns} to lekka biblioteka pomagająca zarządzać datami.
+Udostępnia wiele użytecznych funkcji, takich jak formatowanie dat do 
+ładnego napisu w tym w języku polskim, obliczenia na datach (dodawanie dat, zmiana strefy czasowej,
+porównywanie dat, obliczanie okresu pomiędzy wydarzeniami itp.), edytowanie ich i wiele 
+innych - w zasadzie wszystko, co może być przydatne w operowaniu datami. 
+Można jej używać w języku TypeScript. 
 
 \subsection{react-code-blocks}
-Biblioteka z gotowymi komponentami służącymi do wyświetlania bloków kodu.
+Biblioteka react-code-blocks\cite{react-code-blocks} zawiera gotowe komponenty 
+służące do wyświetlania bloków kodu. Pozwalają one kolorować składnię w zależności
+od języka, zmieniać motywy i dowolnie zmieniać ich wygląd w łatwy sposób. Bibliotekę
+można dodać do projektów korzystających z Reacta.  
 
 \section{Serwer}
 
 \subsection{Node.js}
-Serwer został napisany w środowisku Node.js, które służy do tworzenia aplikacji
-serwerowych w języku JavaScript.
+Serwer został napisany w środowisku Node.js\cite{Node.js},
+które służy do tworzenia aplikacji
+serwerowych w języku JavaScript. Jest to narzędzie działające asynchronicznie, 
+które rozpoczyna wykonywanie odpowiednich funkcji w reakcji na jakieś wydarzenia. 
+Stanowi klasyczny przykład środowiska wykorzystującego język JavaScript. 
 
 \subsection{Google}
-Aplikacja używa bibliotek google-cloud/local-auth oraz googleapis/forms
+Aplikacja używa bibliotek Google Local Auth: Node.js Client\cite{local-auth-node}
+oraz Google APIs Node.js Client\cite{googleapis-forms}
 odpowiednio do autoryzacji projektu oraz użytkownika w serwerach Google 
-oraz do wysyłania zapytań do Google Forms API, które jest opisane w dalszej sekcji.
+oraz do wysyłania zapytań do Google Forms API. Google APIs Node.js Client 
+pomaga budować zapytania oraz zawiera wiele typów wykorzystywanych przez
+Google Forms API.
 
 \subsection{excel4node}
-Biblioteka służąca do tworzenia plików Excel.
+Biblioteka excel4node\cite{excelfornode} służy do tworzenia plików Excel.
+Została stworzona do współpracy ze środowiskiem Node.js. Udostępnia funkcje
+i klasy, które umożliwiają m.in wygenerowanie pliku, dodawanie zmiennych różnych
+typów np. napisów, liczb i dat do odpowiednich komórek, przeprowadzanie obliczeń na
+podanych komórkach oraz stylizowanie komórek np. zmienianie koloru i rozmiaru
+czcionki, koloru komórek i wiele innych.
 
 \subsection{lowdb}
-Mała, lokalna baza danych przechowująca dane w plikach JSON. Za jej pomocą
-przechowywane są zakodowane formularze.
+lowdb\cite{lowdb} to mała, lokalna baza danych przechowująca dane w plikach
+w formacie JSON.
+Została napisane w czystym JavaScripcie i można z niej korzystać w środowisku 
+Node.js. Pozwala ona w łatwy sposób przeprowadzać podstawowe operacje CRUD.
+Można z niej korzystać synchronicznie lub asynchronicznie.
+Za jej pomocą przechowywane są zakodowane formularze. 
 
 \section{npm}
-npm to menadżer pakietów, który jest używany w aplikacji serwera oraz interfejsu użytkownika.
+Narzędzie npm\cite{npm} to menadżer pakietów, który jest używany w aplikacji serwera oraz interfejsu użytkownika.
 npm zarządza pakietami wykorzystywanymi przez te aplikacje. Listy zależności aplikacji, 
 wersje tych zależności
 oraz skrypty, w tym skrypt, który uruchamia aplikację interfejsu użytkownika można znaleźć
 w pliku \texttt{package.json}.
 
 \section{Vagrant i Ansible}
-Vagrant to narzędzie służące do tworzenia wirtualnych środowisk programistycznych
-z użyciem na przykład VirtualBox, ale współdziała też z wieloma innymi oprogramowaniami.
-Ansible to narzędzie służące do automatyzacji
+Vagrant\cite{vagrant} to narzędzie służące do tworzenia wirtualnych środowisk 
+programistycznych z użyciem na przykład VirtualBox, ale współdziała też z wieloma
+innymi oprogramowaniami.
+Ansible\cite{ansible} to narzędzie służące do automatyzacji
 wdrażania, konfiguracji i zarządzania. Z pomocą tych dwóch technologi zostały
 napisane skrypty, które same skonfigurują maszynę wirtualną i następnie uruchomią
 na niej wszystkie aplikacje potrzebne do działania narzędzia. 
@@ -75,34 +120,39 @@ na niej wszystkie aplikacje potrzebne do działania narzędzia.
 \section{Google Forms API oraz Imgur API}
 
 \subsection*{Google Forms API}
-Google Forms API to interfejs, który umożliwia zarządzania Formularzami Google na dysku
+Google Forms API\cite{google-forms-api} to interfejs, który umożliwia zarządzania Formularzami Google na dysku
 użytkownika. W czasie pisania tej pracy jest to wciąż bardzo nowe narzędzie, ponieważ
 jego pierwsza oficjalna wersja została opublikowana w 2022 roku. API pozwala m.in. zarządzać
 pytaniami i odpowiedziami, zmieniać ustawienia formularza i włączać automatyczne ocenianie.
 Jest ono wciąż dynamicznie rozwijane.
 
 \subsection*{Imgur API}
-Imgur API pozwala zarządzać plikami użytkownika na platformie Imgur, w tym dodawać je jako
+Imgur API\cite{imgur-api} pozwala zarządzać plikami użytkownika na platformie Imgur, w tym dodawać je jako
 zalogowany lub niezalogowany użytkownik. Jeśli pytanie, które ma zostać dodane do formularza, 
-zawiera wstawki w języku \LaTeX\, generowane są obrazy z tekstem pytania. Natstępnie 
-zostająv one wgrane na serwery Imgur, aby potem serwery Google
+zawiera wstawki w języku \LaTeX\, generowane są obrazy z tekstem pytania. Następnie 
+zostają one wgrane na serwery Imgur, aby potem serwery Google
 mogły je pobrać używając zewnętrznego URL.
 
 \section{Python}
-Narzędzie korzysta ze skryptu w języku Python, aby stworzyć obrazy ze wstawkami w języku \LaTeX.
+Narzędzie korzysta ze skryptu w języku Python\cite{python}, aby stworzyć obrazy ze wstawkami w języku \LaTeX.
 Jest on dokładnie opisany we wspomnianej wcześniej pracy. Zostało dodane do niego wgrywanie 
 wygenerowanych obrazków na serwery Imgur za pomocą biblioteki imgurpython.
-Wszystkie biblioteki z jakich korzysta skrypt to: imgurpython, tex2pix, pdf2image oraz
-opencv-python.
+Wszystkie biblioteki z jakich korzysta skrypt to: imgurpython\cite{imgurpython},
+tex2pix\cite{tex2pix}, pdf2image\cite{pdf2image} oraz
+opencv-python\cite{opencv-python}.
 
 \section{Poppler}
-Poppler to biblioteka służąca do renderowania plików PDF. Wspomniany powyżej skrypt
+Poppler\cite{poppler} to biblioteka służąca do renderowania plików PDF. Wspomniany powyżej skrypt
 używa pakietu poppler-utils, do tworzenia plików PDF. Ten pakiet jest powszechnie
 używany na systemach operacyjnych opierających się na Debianie.
 
 \section{LaTeX}
 Jak już wiele razy zostało wspomniane w tej pracy, narzędzie pozwala generować formularze ze 
 wstawkami
-w języku \LaTeX, zatem aby narzędzie działało poprawnie \LaTeX\ musi być zainstalowany 
+w języku \LaTeX\cite{latex}, zatem aby narzędzie działało poprawnie \LaTeX\ musi być zainstalowany 
 na maszynie, na której narzędzie ma zostać uruchomione. Skrypt Ansible dodatkowo instaluje
-polski pakiet językowy.
+polski pakiet językowy.\\
+\LaTeX{} jest  językiem programowania służącym do tworzenia plików \*.pdf. Dodatkowo \LaTeX{}
+umożliwia wstawianie do tekstu symboliki matematycznej, tabel, diagramów, schematów
+oraz ułatwia utrzymanie estetycznego i czytelnego układu tekstu.
+

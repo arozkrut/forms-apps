@@ -128,6 +128,8 @@ FormTemplate {
   startDate?: string, // start testu
   endDate?: string, // koniec testu
   responderUri: string, // adres formularza Google
+  shuffleAnswers: boolean, // przemieszywanie odpowiedzi,
+                           // gdy pole wynosi true
 }
   \end{lstlisting}
 \end{figure}
@@ -215,10 +217,12 @@ W tym katalogu można znaleźć wygenerowane podczas oceniania pliki EXCEL z wyn
 usuwać, ale jego zawartość już można.
 
 \subsection{ESLint}
-Do aplikacji serwera został dodany ESLint, który pomaga pisać przejrzysty kod i na bieżąco
+Do aplikacji serwera został dodany ESLint\cite{eslint}, który pomaga pisać przejrzysty kod i na bieżąco
 analizuje kod i sprawdza, czy nie zawiera on błędów. To zachowanie można dowolnie edytować używając 
 zasad udostępnionych przez to narzędzie. Zasady skonfigurowane dla tego projektu można znaleźć 
-w pliku \texttt{.eslintrc.json}. W celu dokładniejszego zrozumienia, jak działa to narzędzie 
+w pliku \texttt{.eslintrc.json} w polu \texttt{rules}. Przykładowo została dodana zasada,
+która zwraca błąd, gdy długość linii przekroczy osiemdziesiąt znaków lub zasada nie
+pozwalająca importować więcej niż raz tę samą zależność. W celu dokładniejszego zrozumienia, jak działa to narzędzie 
 zachęcam do zapoznania się z dokumentacją.
 
 \section{Skrypt w języku Python}
@@ -312,7 +316,7 @@ która jest lekka i prosta w użyciu. Przykładowo używamy funkcji \texttt{form
 ładnie wyświetlić daty we wpisach o formularzach.
 
 \subsection{ESLint}
-Podobnie jak w serwerze, tutaj również został użyty ESLint. W pliku\\
+Podobnie jak w serwerze, tutaj również został użyty ESLint\cite{eslint}. W pliku\\
 \texttt{.eslintrc.json} zostały skonfigurowane zasady dla projektu korzystającego
 z języka TypeScript oraz środowiska React.
 

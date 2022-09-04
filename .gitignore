@@ -20,3 +20,5 @@ thesis/*.toc
 thesis/*.fls
 thesis/*.gz
 thesis/*.fdb_latexmk
+thesis/*.bbl
+thesis/*.blg
