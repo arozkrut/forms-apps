@@ -1,4 +1,4 @@
-/*Plik implementuje delegowanie obliczeń związanych ze zdjęciami do zewnętrzego
+/*Plik implementuje delegowanie obliczeń związanych ze zdjęciami do zewnętrznego
   skryptu.
   Zwracana jest konstrukcja Promise.
   Funkcja wykorzystuje moduł child_process.

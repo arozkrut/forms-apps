@@ -1,3 +1,12 @@
+// Dependencies body-parser, bootstrap, cors, excel4node, express, jsonschema,
+// lowdb, multer
+// were released under MIT license.
+// Dependencies @google-cloud/local-auth, @googleapis/forms
+// were released under Apache 2.0 license.
+// child_process, fs, https were released under ISC license.
+// The full license text can be found in the main directory of their respective
+// github repositories.
+
 export async function updateFormUsingJsonTemplate(
     forms, id, jsonTemplate, links, formInfo
 ) {

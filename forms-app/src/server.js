@@ -1,16 +1,11 @@
-/* Plik zawierający implementację serwera lokalnego.
- * app - aplikacja serwerowa
- * port - stała, numer portu serwera
- * jsonForm - zmienna przechowująca zakodowany formularz
-*/
-
-/* Serwer korzysta z kilku bibliotek:
- * express
- * fs - file system
- * cors - dostępne na podstawie licencji MIT
- * https
- * body-parser - dostępne na podstawie licencji MIT
-*/
+// Dependencies body-parser, bootstrap, cors, excel4node, express, jsonschema,
+// lowdb, multer
+// were released under MIT license.
+// Dependencies @google-cloud/local-auth, @googleapis/forms
+// were released under Apache 2.0 license.
+// child_process, fs, https were released under ISC license.
+// The full license text can be found in the main directory of their respective
+// github repositories.
 
 import express from 'express';
 import { join, dirname } from 'path';
