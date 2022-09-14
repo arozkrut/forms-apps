@@ -276,6 +276,10 @@ app.get('/forms/:id/scores', async (req, res) => {
     }
 });
 
+function delay(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
+
 app.get('/forms/:id/scores/excel', async (req, res) => {
     const id = req.params.id;
     console.log(
@@ -334,6 +338,7 @@ app.get('/forms/:id/scores/excel', async (req, res) => {
         }
 
         await wb.write(`${__dirname}/excels/${id}.xlsx`);
+        await delay(1000);
         res.status(200).sendFile(`${__dirname}/excels/${id}.xlsx`);
     }
     catch( err ){
